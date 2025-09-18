@@ -262,7 +262,7 @@ app.post('/api/auth/logout', (req, res) => {
 
 // Get all employees
 app.get('/api/employees', (req, res) => {
-  res.json(employees);
+  res.json({ employees });
 });
 
 // Create employee (admin only)

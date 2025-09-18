@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,28 +10,16 @@
             padding: 0;
             box-sizing: border-box;
         }
-
+        
         body {
             font-family: 'Georgia', 'Times New Roman', serif;
-            background: #000;
+            background: #000 url('/BLANKSLATE.pdf.png') center center / cover no-repeat;
             color: #fff;
             height: 100vh;
             overflow: hidden;
             position: relative;
         }
-
-        /* Red circular gradient background */
-        .bg-gradient {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 120vmax;
-            height: 120vmax;
-            background: radial-gradient(circle, rgba(255, 85, 67, 0.8) 0%, rgba(255, 85, 67, 0.4) 40%, transparent 70%);
-            z-index: 1;
-        }
-
+        
         /* Main content container */
         .container {
             position: relative;
@@ -44,217 +31,174 @@
             align-items: center;
             padding: 2rem;
         }
-
+        
         /* Sourcegraph logo */
         .logo {
-            display: flex;
-            align-items: center;
-            margin-bottom: 6rem;
-            justify-content: center;
+            margin-bottom: 4rem;
+            max-width: 400px;
         }
-
-        .logo-star {
-            font-size: 3.5rem;
-            color: #ff5543;
-            margin-right: 0.5rem;
-            font-weight: normal;
+        
+        .logo svg {
+            width: 100%;
+            height: auto;
         }
-
-        .logo-text {
-            font-size: 3.5rem;
-            font-weight: 400;
-            color: #fff;
-            letter-spacing: 0.5px;
-        }
-
+        
         /* Form section */
         .form-section {
             display: flex;
             flex-direction: column;
-            gap: 4rem;
-            align-items: center;
+            gap: 3rem;
+            align-items: flex-start;
             min-width: 600px;
         }
-
+        
         .form-row {
             display: flex;
             align-items: center;
-            gap: 3rem;
+            gap: 2rem;
             width: 100%;
-            justify-content: center;
         }
-
+        
         .form-label {
-            font-size: 2.2rem;
+            font-size: 2.5rem;
             font-weight: 400;
             color: #fff;
-            min-width: 220px;
+            min-width: 280px;
             text-align: left;
         }
-
+        
         /* Employee dropdown */
         .employee-dropdown {
             position: relative;
             min-width: 350px;
         }
-
+        
         .dropdown-button {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.15);
             border: 2px solid rgba(255, 255, 255, 0.3);
             color: #fff;
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
+            padding: 1.2rem 1.5rem;
+            border-radius: 12px;
             cursor: pointer;
             width: 100%;
             text-align: left;
-            font-size: 1.1rem;
+            font-size: 1.3rem;
             font-family: inherit;
             display: flex;
             align-items: center;
             gap: 1rem;
             transition: all 0.3s ease;
         }
-
+        
         .dropdown-button:hover {
             border-color: #ff5543;
-            background: rgba(255, 85, 67, 0.1);
+            background: rgba(255, 85, 67, 0.2);
         }
-
+        
         .employee-photo {
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.5);
         }
-
+        
         .dropdown-content {
             position: absolute;
             top: 100%;
             left: 0;
             right: 0;
-            background: rgba(40, 40, 40, 0.95);
+            background: rgba(0, 0, 0, 0.9);
             border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 8px;
+            border-radius: 12px;
             margin-top: 0.5rem;
-            max-height: 300px;
+            max-height: 350px;
             overflow-y: auto;
             z-index: 10;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
         }
-
+        
+        .dropdown-search {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            padding: 1rem;
+            width: 100%;
+            font-family: inherit;
+            font-size: 1.1rem;
+            outline: none;
+        }
+        
+        .dropdown-search::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
         .dropdown-item {
-            padding: 1rem 1.5rem;
+            padding: 1.2rem 1.5rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 1rem;
             transition: background 0.2s ease;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
         }
-
+        
         .dropdown-item:hover {
-            background: rgba(255, 85, 67, 0.2);
+            background: rgba(255, 85, 67, 0.3);
         }
-
-        .dropdown-search {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: #fff;
-            padding: 0.75rem;
-            width: 100%;
-            font-family: inherit;
-            font-size: 1rem;
-            outline: none;
-        }
-
-        .dropdown-search::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
+        
         /* Name input */
         .name-input {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.15);
             border: 2px solid rgba(255, 255, 255, 0.3);
             color: #fff;
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            font-size: 1.1rem;
+            padding: 1.2rem 1.5rem;
+            border-radius: 12px;
+            font-size: 1.3rem;
             font-family: inherit;
             min-width: 350px;
             outline: none;
             transition: all 0.3s ease;
         }
-
+        
         .name-input:focus {
             border-color: #ff5543;
-            background: rgba(255, 85, 67, 0.1);
+            background: rgba(255, 85, 67, 0.2);
         }
-
+        
         .name-input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+            color: rgba(255, 255, 255, 0.6);
         }
-
+        
         /* Send button */
         .send-button {
             background: #ff5543;
             color: #fff;
             border: none;
             padding: 1.2rem 4rem;
-            border-radius: 8px;
-            font-size: 1.3rem;
+            border-radius: 12px;
+            font-size: 1.4rem;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 1rem;
+            margin-top: 3rem;
             transition: all 0.3s ease;
             align-self: center;
-            font-family: inherit;
+            opacity: 0;
+            transform: translateY(20px);
         }
-
+        
+        .send-button.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
         .send-button:hover {
             background: #e04435;
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(255, 85, 67, 0.4);
         }
-
-        .send-button:disabled {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .form-section {
-                min-width: 90vw;
-                gap: 3rem;
-            }
-
-            .form-row {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-
-            .form-label {
-                font-size: 1.8rem;
-                min-width: auto;
-            }
-
-            .employee-dropdown,
-            .name-input {
-                min-width: 100%;
-                width: 100%;
-            }
-
-            .logo-text {
-                font-size: 2.8rem;
-            }
-
-            .logo-star {
-                font-size: 2.8rem;
-            }
-        }
-
+        
         /* Success modal */
         .success-modal {
             position: fixed;
@@ -262,25 +206,26 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 100;
-        }
-
-        .success-content {
-            background: rgba(40, 40, 40, 0.95);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 12px;
-            padding: 3rem;
-            text-align: center;
             backdrop-filter: blur(10px);
         }
-
+        
+        .success-content {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 4rem;
+            text-align: center;
+            backdrop-filter: blur(15px);
+        }
+        
         .success-icon {
-            width: 80px;
-            height: 80px;
+            width: 100px;
+            height: 100px;
             margin: 0 auto 2rem;
             background: #10b981;
             border-radius: 50%;
@@ -288,52 +233,72 @@
             align-items: center;
             justify-content: center;
         }
-
+        
         .success-title {
-            font-size: 2rem;
+            font-size: 2.5rem;
             margin-bottom: 1rem;
             color: #fff;
+            font-family: inherit;
         }
-
+        
         .success-message {
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 2rem;
+            margin-bottom: 3rem;
+            font-family: inherit;
         }
-
+        
         .ok-button {
             background: #ff5543;
             color: #fff;
             border: none;
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            font-size: 1.1rem;
+            padding: 1.2rem 3rem;
+            border-radius: 12px;
+            font-size: 1.3rem;
+            font-weight: 600;
             cursor: pointer;
             transition: background 0.3s ease;
+            font-family: inherit;
         }
-
+        
         .ok-button:hover {
             background: #e04435;
         }
-
+        
         .hidden {
             display: none;
         }
     </style>
 </head>
-
 <body>
-    <!-- Red circular gradient background -->
-    <div class="bg-gradient"></div>
-
     <!-- Main content -->
     <div class="container">
         <!-- Sourcegraph logo -->
         <div class="logo">
-            <span class="logo-star">✱</span>
-            <div class="logo-text">Sourcegraph</div>
+            <svg viewBox="0 0 1190 158.67">
+                <defs>
+                    <style>.cls-1{fill:#ff5543;}.cls-2{fill:#fcfcfc;}</style>
+                </defs>
+                <g>
+                    <path class="cls-1" d="M61.63,42.25l18.54,4.94L67.55,0l-21.38,5.75,7.62,28.62c1.02,3.84,4.03,6.86,7.85,7.88Z"/>
+                    <polygon class="cls-1" points="45.07 123.62 51.01 117.69 68.17 100.56 69.79 98.95 70.74 98.01 71.08 99.3 71.67 101.5 75.93 117.4 80.09 132.96 85.45 153 106.84 147.25 101.46 127.03 101.25 126.33 85.53 67.4 26.55 51.68 25.81 51.48 25.38 51.37 25.38 51.35 5.68 46.11 0 67.62 19.97 72.95 31 75.9 51.44 81.37 53.65 81.96 54.94 82.3 53.99 83.25 52.38 84.87 40.69 96.57 29.31 107.96 14.67 122.61 30.3 138.37 45.07 123.62"/>
+                    <path class="cls-1" d="M105.7,72.74l4.97,18.62c1.02,3.84,4.04,6.86,7.86,7.87l28.79,7.65,5.68-21.5-47.3-12.64Z"/>
+                    <path class="cls-1" d="M122.7,14.63l-18.41,18.37c-2.03,2.03-3.19,4.73-3.26,7.61l-.29,11.66,10.37.38c.13,0,.27,0,.4,0,2.95,0,5.72-1.15,7.81-3.24l19-19.02-15.62-15.76Z"/>
+                    <path class="cls-2" d="M261.18,68.36c-6.54-2.75-14.72-5.05-24.54-6.89-6.7-1.4-11.72-2.64-15.07-3.72-3.35-1.08-5.83-2.46-7.45-4.13-1.62-1.67-2.43-3.97-2.43-6.88,0-3.46.94-6.13,2.83-8.02s4.46-3.21,7.7-3.97c3.24-.75,7.29-1.13,12.15-1.13,5.83,0,11.64.7,17.42,2.11,5.78,1.41,12.01,3.62,18.71,6.64l3.56-20.09c-6.05-2.92-12.39-5.08-19.04-6.48-6.64-1.4-13.53-2.11-20.65-2.11-8.53,0-16.31,1.32-23.33,3.97-7.02,2.65-12.64,6.48-16.85,11.5-4.21,5.02-6.32,11.15-6.32,18.39,0,6.37,1.62,11.72,4.86,16.04,3.24,4.32,7.99,7.8,14.26,10.45,6.26,2.65,14.26,4.83,23.98,6.56,6.91,1.41,12.09,2.67,15.55,3.81,3.46,1.13,6.16,2.7,8.1,4.7,1.94,2,2.92,4.89,2.92,8.67,0,3.46-1.11,6.18-3.32,8.18-2.21,2-5.13,3.35-8.75,4.05-3.62.7-7.97,1.05-13.04,1.05-7.02,0-14.72-.92-23.08-2.75-8.37-1.83-15.58-4.32-21.63-7.45l-2.11,19.93c5.83,3.35,12.82,5.89,20.98,7.61,8.15,1.73,16.87,2.59,26.16,2.59s16.95-1.32,24.3-3.97c7.34-2.64,13.2-6.53,17.58-11.66,4.37-5.13,6.56-11.37,6.56-18.71,0-6.8-1.7-12.53-5.1-17.17-3.4-4.64-8.37-8.34-14.9-11.1Z"/>
+                    <path class="cls-2" d="M362.03,44.22c-7.45-3.94-15.77-5.91-24.95-5.91s-17.77,1.97-25.11,5.91c-7.35,3.94-13.1,9.45-17.25,16.52-4.16,7.08-6.24,15.04-6.24,23.9s2.05,16.63,6.16,23.65c4.1,7.02,9.85,12.56,17.25,16.61,7.4,4.05,15.79,6.08,25.19,6.08s17.5-2.03,24.95-6.08c7.45-4.05,13.26-9.61,17.42-16.69,4.16-7.07,6.24-14.98,6.24-23.73s-2.08-16.79-6.24-23.81c-4.16-7.02-9.96-12.5-17.42-16.44ZM360.57,98.73c-2.27,4.11-5.46,7.32-9.56,9.64-4.11,2.32-8.7,3.48-13.77,3.48s-9.99-1.16-14.09-3.48c-4.11-2.32-7.35-5.56-9.72-9.72-2.38-4.16-3.56-8.94-3.56-14.34s1.19-10.1,3.56-14.09c2.38-3.99,5.62-7.13,9.72-9.4,4.1-2.27,8.75-3.4,13.93-3.4s9.83,1.13,13.93,3.4c4.1,2.27,7.29,5.46,9.56,9.56,2.27,4.11,3.4,8.86,3.4,14.26s-1.13,9.99-3.4,14.09Z"/>
+                    <path class="cls-2" d="M461.33,92.96c-.41,1.08-.86,2.14-1.38,3.18-2.32,4.64-5.54,8.32-9.64,11.02-4.11,2.7-8.69,4.05-13.77,4.05-6.7,0-11.69-1.81-14.98-5.43-3.3-3.62-4.94-8.77-4.94-15.47v-50.22h-21.54v53.46c0,7.56,1.51,14.15,4.54,19.76,3.02,5.62,7.23,9.94,12.64,12.96,5.4,3.02,11.61,4.54,18.63,4.54,10.58,0,18.96-2.7,25.11-8.1,2.02-1.77,3.78-3.71,5.35-5.81v12.13h21.54V40.09h-21.54v52.87Z"/>
+                    <path class="cls-2" d="M542.49,38.47c-10.15,0-17.77,3.35-22.84,10.04-1.2,1.59-2.28,3.36-3.24,5.31v-13.73h-21.55v88.94h21.55v-36.61c0-9.93,2.13-17.9,6.4-23.89,4.26-5.99,10.07-8.99,17.41-8.99h5.35c1.08.11,2.05.16,2.92.16h2.59l2.43-20.09c-3.78-.75-7.45-1.13-11.02-1.13Z"/>
+                    <path class="cls-2" d="M588.58,60.58c4.16-2.21,8.88-3.32,14.18-3.32,4.32,0,8.37.65,12.15,1.94,3.78,1.3,7.61,3.4,11.5,6.32l8.91-16.04c-5.29-3.89-10.69-6.72-16.2-8.5-5.51-1.78-11.56-2.67-18.14-2.67-8.75,0-16.74,1.92-23.98,5.75-7.24,3.83-12.96,9.29-17.17,16.36-4.21,7.08-6.32,15.15-6.32,24.22s2.05,17.09,6.16,24.06c4.1,6.97,9.8,12.37,17.09,16.2,7.29,3.83,15.31,5.75,24.06,5.75,6.69,0,12.66-.84,17.9-2.51,5.24-1.67,10.77-4.46,16.6-8.34l-8.59-15.71c-3.89,2.59-7.8,4.56-11.75,5.91-3.94,1.35-7.97,2.03-12.07,2.03-5.29,0-10.04-1.08-14.26-3.24-4.21-2.16-7.53-5.32-9.96-9.48-2.43-4.16-3.65-9.04-3.65-14.66s1.21-10.61,3.65-14.66c2.43-4.05,5.72-7.18,9.88-9.4Z"/>
+                    <path class="cls-2" d="M704.68,39.74c-5.89,0-11.64,1.08-17.25,3.24-5.62,2.16-10.91,5.4-15.87,9.72V40.09h-21.55v88.94h21.55v-39.18c0-7.78,1.59-14.42,4.78-19.92,3.19-5.51,7.4-9.69,12.64-12.56,5.24-2.86,10.88-4.29,16.93-4.29,5.51,0,9.93,1.35,13.28,4.05,3.35,2.7,5.02,6.64,5.02,11.82v59.09h21.55v-62.65c0-8.64-1.73-15.63-5.18-20.98-3.46-5.35-8.02-9.26-13.69-11.74-5.67-2.48-11.64-3.72-17.9-3.72Z"/>
+                    <path class="cls-2" d="M826.28,107.48c-5.29,0-10.04-1.08-14.26-3.24-4.21-2.16-7.53-5.32-9.96-9.48-2.43-4.16-3.65-9.04-3.65-14.66s1.21-10.61,3.65-14.66c2.43-4.05,5.75-7.18,9.96-9.4,4.21-2.21,8.96-3.32,14.26-3.32s10.04,1.11,14.26,3.32c4.21,2.21,7.53,5.35,9.96,9.4,2.43,4.05,3.65,8.99,3.65,14.82s-1.21,10.69-3.65,14.5c-2.43,3.81-5.75,6.86-9.96,9.16-4.21,2.3-8.96,3.45-14.26,3.45Zm0,22.35c9.07,0,17.17-1.97,24.3-5.91,7.13-3.94,12.66-9.45,16.61-16.52,3.94-7.08,5.91-15.12,5.91-24.14s-1.97-16.95-5.91-23.98c-3.94-7.02-9.48-12.5-16.61-16.44-7.13-3.94-15.23-5.91-24.3-5.91s-17.17,1.97-24.3,5.91c-7.13,3.94-12.69,9.42-16.69,16.44-4,7.02-6,15.04-6,24.06s2,17.09,6,24.06c4,6.97,9.56,12.45,16.69,16.36,7.13,3.91,15.23,5.86,24.3,5.86Z"/>
+                    <path class="cls-2" d="M946.86,92.96c-.41,1.08-.86,2.14-1.38,3.18-2.32,4.64-5.54,8.32-9.64,11.02-4.11,2.7-8.69,4.05-13.77,4.05-6.7,0-11.69-1.81-14.98-5.43-3.3-3.62-4.94-8.77-4.94-15.47v-50.22h-21.54v53.46c0,7.56,1.51,14.15,4.54,19.76,3.02,5.62,7.23,9.94,12.64,12.96,5.4,3.02,11.61,4.54,18.63,4.54,10.58,0,18.96-2.7,25.11-8.1,2.02-1.77,3.78-3.71,5.35-5.81v12.13h21.54V40.09h-21.54v52.87Z"/>
+                    <path class="cls-2" d="M1028.02,38.47c-10.15,0-17.77,3.35-22.84,10.04-1.2,1.59-2.28,3.36-3.24,5.31v-13.73h-21.55v88.94h21.55v-36.61c0-9.93,2.13-17.9,6.4-23.89,4.26-5.99,10.07-8.99,17.41-8.99h5.35c1.08.11,2.05.16,2.92.16h2.59l2.43-20.09c-3.78-.75-7.45-1.13-11.02-1.13Z"/>
+                    <path class="cls-2" d="M1120.87,107.48c-5.29,0-10.04-1.08-14.26-3.24-4.21-2.16-7.53-5.32-9.96-9.48-2.43-4.16-3.65-9.04-3.65-14.66s1.21-10.61,3.65-14.66c2.43-4.05,5.75-7.18,9.96-9.4,4.21-2.21,8.96-3.32,14.26-3.32s10.04,1.11,14.26,3.32c4.21,2.21,7.53,5.35,9.96,9.4,2.43,4.05,3.65,8.99,3.65,14.82s-1.21,10.69-3.65,14.5c-2.43,3.81-5.75,6.86-9.96,9.16-4.21,2.3-8.96,3.45-14.26,3.45Zm0,22.35c9.07,0,17.17-1.97,24.3-5.91,7.13-3.94,12.66-9.45,16.61-16.52,3.94-7.08,5.91-15.12,5.91-24.14s-1.97-16.95-5.91-23.98c-3.94-7.02-9.48-12.5-16.61-16.44-7.13-3.94-15.23-5.91-24.3-5.91s-17.17,1.97-24.3,5.91c-7.13,3.94-12.69,9.42-16.69,16.44-4,7.02-6,15.04-6,24.06s2,17.09,6,24.06c4,6.97,9.56,12.45,16.69,16.36,7.13,3.91,15.23,5.86,24.3,5.86Z"/>
+                    <path class="cls-2" d="M1190,40.09h-21.55v88.94h21.55V40.09Z"/>
+                </g>
+            </svg>
         </div>
-
+        
         <!-- Form section -->
         <div class="form-section">
             <!-- Meeting with dropdown -->
@@ -351,24 +316,24 @@
                     </div>
                 </div>
             </div>
-
+            
             <!-- Your name input -->
             <div class="form-row">
                 <label class="form-label">Your name:</label>
                 <input type="text" class="name-input" id="visitorName" placeholder="Enter your name">
             </div>
-
+            
             <!-- Send button (hidden until both fields filled) -->
-            <button class="send-button hidden" id="sendButton">Send</button>
+            <button class="send-button" id="sendButton">Send</button>
         </div>
     </div>
-
+    
     <!-- Success modal -->
     <div class="success-modal hidden" id="successModal">
         <div class="success-content">
             <div class="success-icon">
-                <svg width="40" height="40" fill="#fff" viewBox="0 0 24 24">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
+                <svg width="50" height="50" fill="#fff" viewBox="0 0 24 24">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
                 </svg>
             </div>
             <h2 class="success-title">Notification Sent!</h2>
@@ -380,26 +345,30 @@
     <script>
         let employees = [];
         let selectedEmployee = null;
-
+        
         // Fetch employees
         async function fetchEmployees() {
             try {
+                console.log('Fetching employees...');
                 const response = await fetch('/api/employees');
                 const data = await response.json();
+                console.log('Employee data:', data);
                 employees = data.employees || [];
                 renderEmployeeList();
             } catch (error) {
                 console.error('Error fetching employees:', error);
             }
         }
-
+        
         // Render employee dropdown list
         function renderEmployeeList(searchTerm = '') {
             const list = document.getElementById('employeeList');
-            const filtered = employees.filter(emp =>
+            const filtered = employees.filter(emp => 
                 emp.name.toLowerCase().includes(searchTerm.toLowerCase())
             );
-
+            
+            console.log('Rendering employees:', filtered);
+            
             list.innerHTML = filtered.map(employee => `
                 <div class="dropdown-item" onclick="selectEmployee(${employee.id}, '${employee.name}', '${employee.photo_url || ''}')">
                     <img src="${employee.photo_url || ''}" alt="${employee.name}" class="employee-photo" 
@@ -408,45 +377,33 @@
                 </div>
             `).join('');
         }
-
+        
         // Select employee
         function selectEmployee(id, name, photoUrl) {
             selectedEmployee = { id, name, photoUrl };
-            const button = document.getElementById('employeeButton');
-            const nameElement = document.getElementById('selectedEmployeeName');
-
-            // Update button content with photo and name
-            if (photoUrl) {
-                button.innerHTML = `
-                    <img src="${photoUrl}" alt="${name}" class="employee-photo">
-                    <span id="selectedEmployeeName">${name}</span>
-                `;
-            } else {
-                button.innerHTML = `<span id="selectedEmployeeName">${name}</span>`;
-            }
-
+            document.getElementById('selectedEmployeeName').textContent = name;
             document.getElementById('employeeDropdown').classList.add('hidden');
             checkFormComplete();
         }
-
+        
         // Check if form is complete and show send button
         function checkFormComplete() {
             const visitorName = document.getElementById('visitorName').value.trim();
             const sendButton = document.getElementById('sendButton');
-
+            
             if (selectedEmployee && visitorName) {
-                sendButton.classList.remove('hidden');
+                sendButton.classList.add('show');
             } else {
-                sendButton.classList.add('hidden');
+                sendButton.classList.remove('show');
             }
         }
-
+        
         // Send notification
         async function sendNotification() {
             if (!selectedEmployee) return;
-
+            
             const visitorName = document.getElementById('visitorName').value.trim();
-
+            
             try {
                 const response = await fetch('/api/notify', {
                     method: 'POST',
@@ -456,7 +413,7 @@
                         visitorName: visitorName
                     })
                 });
-
+                
                 if (response.ok) {
                     document.getElementById('successModal').classList.remove('hidden');
                 } else {
@@ -467,48 +424,47 @@
                 alert('Failed to send notification. Please try again.');
             }
         }
-
+        
         // Reset form
         function resetForm() {
             selectedEmployee = null;
-            document.getElementById('employeeButton').innerHTML = '<span id="selectedEmployeeName">Select an employee...</span>';
+            document.getElementById('selectedEmployeeName').textContent = 'Select an employee...';
             document.getElementById('visitorName').value = '';
-            document.getElementById('sendButton').classList.add('hidden');
+            document.getElementById('sendButton').classList.remove('show');
             document.getElementById('successModal').classList.add('hidden');
             document.getElementById('searchInput').value = '';
             renderEmployeeList();
         }
-
+        
         // Event listeners
-        document.getElementById('employeeButton').addEventListener('click', function () {
+        document.getElementById('employeeButton').addEventListener('click', function() {
             const dropdown = document.getElementById('employeeDropdown');
             dropdown.classList.toggle('hidden');
             if (!dropdown.classList.contains('hidden')) {
                 document.getElementById('searchInput').focus();
             }
         });
-
-        document.getElementById('searchInput').addEventListener('input', function (e) {
+        
+        document.getElementById('searchInput').addEventListener('input', function(e) {
             renderEmployeeList(e.target.value);
         });
-
+        
         document.getElementById('visitorName').addEventListener('input', checkFormComplete);
-
+        
         document.getElementById('sendButton').addEventListener('click', sendNotification);
-
+        
         // Close dropdown when clicking outside
-        document.addEventListener('click', function (e) {
+        document.addEventListener('click', function(e) {
             const dropdown = document.getElementById('employeeDropdown');
             const button = document.getElementById('employeeButton');
-
+            
             if (!dropdown.contains(e.target) && !button.contains(e.target)) {
                 dropdown.classList.add('hidden');
             }
         });
-
+        
         // Initialize
         fetchEmployees();
     </script>
 </body>
-
 </html>
