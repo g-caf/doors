@@ -1,338 +1,192 @@
-# Guest Check-in System 🚪
+# Guest Check-in System
 
-A comprehensive Node.js/Express backend system for managing guest check-ins, employee directories, and real-time notifications. Built with TypeScript, SQLite, and modern security practices.
+A simple guest check-in system built with Express.js and vanilla JavaScript. This application provides a kiosk interface for guests to notify employees of their arrival and an admin dashboard for managing employees.
 
-## 🌟 Features
+## Features
 
-### Core Functionality
-- **Employee Management** - Complete CRUD operations with photo uploads
-- **Guest Check-in System** - Track visitor activity and purpose of visit
-- **Real-time Notifications** - Email and SMS alerts to employees
-- **Admin Authentication** - JWT-based secure admin access
-- **File Upload Management** - Employee photo handling with validation
-- **Activity Logging** - Comprehensive visitor tracking and reporting
+- **Kiosk Interface**: Touch-friendly interface for guests to select employees and leave messages
+- **Employee Management**: Admin dashboard to add, edit, and delete employees  
+- **Photo Upload**: Support for employee profile photos
+- **Activity Logging**: Track all guest check-ins with timestamps
+- **Simple Authentication**: Session-based admin authentication
+- **Rate Limiting**: API protection against abuse
+- **Static HTML**: No build process required
 
-### Security & Performance
-- **Rate Limiting** - API protection against abuse
-- **Input Validation** - Comprehensive request validation
-- **Security Headers** - Helmet.js integration
-- **File Upload Security** - Type and size validation
-- **CORS Protection** - Configurable cross-origin policies
+## Tech Stack
 
-## 🚀 Quick Start
+- **Frontend**: Static HTML, Vanilla JavaScript, Tailwind CSS (CDN)
+- **Backend**: Express.js, Node.js
+- **Data Storage**: JSON files (in-memory with persistence)
+- **Authentication**: Express sessions
+- **File Upload**: Multer
+- **Security**: Helmet, CORS, Rate Limiting
 
-### Prerequisites
-- Node.js 16+ 
-- npm or yarn
+## Quick Start
 
-### Installation
-```bash
-# Clone the repository
-git clone <your-repo-url>
-cd guest-checkin-system
+1. **Clone and Install**:
+   ```bash
+   npm install
+   ```
 
-# Install dependencies
-npm install
+2. **Environment Setup** (optional):
+   ```bash
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
 
-# Set up environment
-cp .env.example .env
-# Edit .env with your configuration
+3. **Start the Application**:
+   ```bash
+   npm start
+   ```
 
-# Initialize database
-npm run db:init
+   For development with auto-restart:
+   ```bash
+   npm run dev
+   ```
 
-# Create admin user
-npm run create-admin
+4. **Access the Application**:
+   - Kiosk Interface: http://localhost:3000
+   - Admin Login: http://localhost:3000/admin
+   - Admin Credentials: username `admin`, password `admin123`
 
-# Start development server
-npm run dev
-```
-
-### Production Deployment
-```bash
-# Build the project
-npm run build
-
-# Start production server
-npm start
-```
-
-## 📁 Project Structure
-
-```
-├── server/                 # Backend TypeScript code
-│   ├── config/            # Database configuration
-│   ├── controllers/       # Request handlers
-│   ├── middleware/        # Auth, validation, security
-│   ├── routes/           # API endpoints
-│   ├── services/         # Email/SMS services
-│   ├── scripts/          # Database utilities
-│   └── types/            # TypeScript definitions
-├── src/                   # Frontend React code (optional)
-├── public/               # Static files and uploads
-├── data/                 # SQLite database
-└── dist/                 # Compiled JavaScript
-```
-
-## 🔌 API Endpoints
-
-### Public Endpoints
-- `GET /health` - System health check
-- `GET /api/employees` - List active employees
-- `POST /api/notify` - Send visitor notifications
-- `POST /api/activity` - Log guest check-in
-
-### Admin Endpoints (Protected)
-- `POST /api/auth/login` - Admin authentication
-- `GET /api/auth/profile` - Get admin profile
-- `POST /api/employees` - Create employee
-- `PUT /api/employees/:id` - Update employee
-- `DELETE /api/employees/:id` - Delete employee
-- `GET /api/activity` - Get activity logs
-- `GET /api/activity/stats` - Get activity statistics
-
-### Example API Usage
-
-#### Employee Management
-```javascript
-// Create employee (Admin only)
-POST /api/employees
-Content-Type: multipart/form-data
-Authorization: Bearer <admin-token>
-
-{
-  "name": "John Doe",
-  "department": "Engineering",
-  "position": "Senior Developer",
-  "email": "john@company.com",
-  "phone": "+1-555-0123",
-  "photo": <file>
-}
-```
-
-#### Send Notification
-```javascript
-// Notify employee of visitor
-POST /api/notify
-Content-Type: application/json
-
-{
-  "type": "both",
-  "employeeId": 1,
-  "guestName": "Jane Smith",
-  "guestPhone": "+1-555-0456",
-  "purpose": "Business meeting",
-  "message": "Visitor waiting in lobby"
-}
-```
-
-## ⚙️ Configuration
-
-### Environment Variables
-```bash
-# Server Configuration
-NODE_ENV=development
-PORT=3001
-JWT_SECRET=your-secure-jwt-secret
-DEFAULT_ADMIN_PASSWORD=admin123
-
-# Database
-DB_PATH=./data/app.db
-
-# Email Configuration (SMTP)
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_SECURE=false
-SMTP_USER=your-email@gmail.com
-SMTP_PASS=your-app-password
-FROM_EMAIL=your-email@gmail.com
-
-# SMS Configuration (Optional - Twilio)
-TWILIO_ACCOUNT_SID=your_account_sid
-TWILIO_AUTH_TOKEN=your_auth_token
-TWILIO_PHONE_NUMBER=+1234567890
-
-# Security
-FRONTEND_URL=https://your-frontend-domain.com
-MAX_FILE_SIZE=5242880
-RATE_LIMIT_MAX=100
-```
-
-### Email Setup
-1. **Gmail**: Enable 2-factor auth and create app password
-2. **Outlook**: Use smtp-mail.outlook.com:587
-3. **SendGrid**: Use smtp.sendgrid.net:587
-
-## 🗄️ Database Schema
-
-### Tables
-- **users** - Admin authentication
-  - id, username, password, role, created_at
-- **employees** - Employee directory
-  - id, name, department, position, email, phone, photo, is_active
-- **activity_logs** - Guest check-in records
-  - id, employee_id, guest_name, purpose, check_in_time, etc.
-
-### Sample Data
-The system automatically creates sample employees in development mode.
-
-## 🛡️ Security Features
-
-### Rate Limiting
-- **General API**: 100 requests/15min
-- **Authentication**: 5 attempts/15min  
-- **File Uploads**: 10 uploads/hour
-- **Notifications**: 10 requests/5min
-
-### File Upload Protection
-- **Size Limit**: 5MB per file
-- **Allowed Types**: JPEG, PNG, GIF, WebP
-- **Validation**: MIME type and extension checking
-- **Storage**: Secure file naming and directory structure
+## API Endpoints
 
 ### Authentication
-- **JWT Tokens**: 24-hour expiration
-- **Password Hashing**: bcryptjs with salt rounds
-- **Role-based Access**: Admin vs public endpoint separation
+- `POST /api/auth/login` - Admin login
+- `POST /api/auth/logout` - Admin logout
 
-## 📊 Monitoring & Logging
+### Employees
+- `GET /api/employees` - List all employees
+- `POST /api/employees` - Create employee (admin only)
+- `PUT /api/employees/:id` - Update employee (admin only)
+- `DELETE /api/employees/:id` - Delete employee (admin only)
 
-### Health Checks
-```bash
-curl http://localhost:3001/health
+### Notifications
+- `POST /api/notify` - Send notification to employee (currently console logs)
+
+### Activity
+- `GET /api/activity` - Get activity logs (admin only)
+
+### Health
+- `GET /health` - Health check endpoint
+
+## Configuration
+
+### Environment Variables
+
+```env
+# Session configuration (optional)
+SESSION_SECRET=your-secret-key-here-change-in-production
+
+# Port (optional - defaults to 3000)
+PORT=3000
+
+# Node environment
+NODE_ENV=production
 ```
 
-### Logs
-- Console logging in development
-- Combined format in production
-- Error tracking and stack traces
+### Admin Account
 
-### Testing
-```bash
-# API testing
-npm run test:api
+Default admin credentials:
+- Username: `admin`
+- Password: `admin123`
 
-# Manual testing endpoints
-curl -X GET http://localhost:3001/api/employees
-curl -X POST http://localhost:3001/health
+Change these in `app.js` for production use.
+
+## Data Storage
+
+The application uses simple JSON file storage:
+- `data/employees.json` - Employee data
+- `data/activity.json` - Activity logs
+- `public/uploads/` - Employee photos
+
+Data persists automatically and loads on server restart.
+
+## Deployment
+
+### Render.com
+
+This application is configured for easy deployment on Render:
+
+1. Connect your GitHub repository to Render
+2. Create a new Web Service
+3. Use these settings:
+   - Build Command: `npm install`
+   - Start Command: `npm start`
+4. Add environment variables if needed
+5. Deploy
+
+### Other Platforms
+
+The application works on any Node.js hosting platform:
+
+1. Upload your code
+2. Run `npm install`
+3. Start with `npm start`
+4. Ensure port is configured correctly
+
+## Development
+
+### Project Structure
+
+```
+├── views/                 # Static HTML pages
+│   ├── index.html        # Kiosk interface
+│   ├── admin.html        # Admin login
+│   └── dashboard.html    # Admin dashboard
+├── public/               # Static assets and uploads
+├── data/                 # JSON data storage
+├── app.js                # Main Express server
+├── package.json          # Dependencies and scripts
+└── README.md            # This file
 ```
 
-## 🚀 Deployment
+### Scripts
 
-### Render.com (Recommended)
-1. Connect GitHub repository
-2. Use included `render.yaml` configuration
-3. Set environment variables in dashboard
-4. Automatic deployment on git push
+- `npm start` - Start production server
+- `npm run dev` - Start development server with nodemon
+- `npm test` - Run API tests
 
-### Manual Deployment
-```bash
-# Build for production
-npm run build
+### Adding Features
 
-# Set production environment
-export NODE_ENV=production
+Since this uses vanilla JavaScript and static HTML:
 
-# Start server
-npm start
-```
+1. **Frontend**: Edit HTML files in `/views/` directory
+2. **Backend**: Modify `app.js` for API endpoints
+3. **Styling**: Uses Tailwind CSS via CDN - add classes directly in HTML
+4. **JavaScript**: Add vanilla JS directly in HTML `<script>` tags
 
-### Docker (Optional)
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY dist/ ./dist/
-COPY public/ ./public/
-EXPOSE 3001
-CMD ["npm", "start"]
-```
+## Security Features
 
-## 🛠️ Development
+- Session-based authentication
+- Rate limiting on API endpoints
+- File upload validation (images only, 5MB limit)
+- CORS protection
+- Security headers with Helmet
+- Input validation
 
-### Available Scripts
-```bash
-npm run dev              # Start dev server with hot reload
-npm run server:dev       # Backend only development
-npm run server:build     # Compile TypeScript
-npm run build           # Full production build
-npm run start           # Start production server
-npm run db:init         # Initialize database
-npm run create-admin    # Create admin user
-npm run test:api        # Test API endpoints
-npm run lint           # Run ESLint
-```
+## Customization
 
-### Development Workflow
-1. Make changes to TypeScript files
-2. Server auto-restarts with nodemon
-3. Test endpoints with provided test script
-4. Build and deploy when ready
+### Styling
 
-## 🔧 Troubleshooting
+The application uses Tailwind CSS via CDN. Modify classes directly in HTML files.
 
-### Common Issues
+### Notifications
 
-**Database connection errors**
-```bash
-# Recreate database
-rm data/app.db
-npm run db:init
-```
+Currently logs notifications to console. Extend the `/api/notify` endpoint in `app.js` to add email/SMS functionality.
 
-**Email not sending**
-```bash
-# Test email configuration
-curl -X POST http://localhost:3001/api/notify/test/email \
-  -H "Content-Type: application/json" \
-  -d '{"email":"test@example.com"}'
-```
+### Authentication
 
-**Build failures**
-```bash
-# Clean and rebuild
-rm -rf dist/
-npm run server:build
-```
+Simple username/password check in `app.js`. For production, implement proper password hashing and user management.
 
-**File upload issues**
-- Check `public/uploads/` directory exists
-- Verify file size under 5MB
-- Ensure valid image format (JPEG, PNG, GIF, WebP)
+## Production Considerations
 
-## 🤝 Contributing
+1. **Change Admin Credentials**: Update the hardcoded admin credentials in `app.js`
+2. **Session Secret**: Set `SESSION_SECRET` environment variable
+3. **File Storage**: Consider cloud storage for uploaded images
+4. **Database**: For larger deployments, consider migrating to a proper database
+5. **Security**: Add HTTPS and additional security measures
 
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
+## License
 
-## 📜 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙋‍♂️ Support
-
-For questions, issues, or feature requests:
-1. Check the troubleshooting section
-2. Review the API documentation
-3. Create an issue on GitHub
-4. Contact the development team
-
-## 🔄 Changelog
-
-### v1.0.0
-- Initial release
-- Employee management system
-- Guest check-in functionality
-- Email/SMS notifications
-- Admin authentication
-- File upload support
-- Rate limiting and security features
-- Render.com deployment configuration
-
----
-
-**Built with ❤️ using Node.js, Express, TypeScript, and SQLite**
+This project is licensed under the MIT License.

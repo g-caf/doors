@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Guest Check-in System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
+            <div class="flex items-center space-x-4">
+                <a href="/" class="text-blue-600 hover:text-blue-800">View Kiosk</a>
+                <button onclick="logout()" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">
+                    Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-4 py-8">
+        <!-- Tab Navigation -->
+        <div class="mb-8">
+            <nav class="flex space-x-8">
+                <button 
+                    onclick="showTab('employees')" 
+                    id="employeesTab"
+                    class="tab-button active px-4 py-2 text-sm font-medium border-b-2 border-blue-500 text-blue-600"
+                >
+                    Employees
+                </button>
+                <button 
+                    onclick="showTab('activity')" 
+                    id="activityTab"
+                    class="tab-button px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700"
+                >
+                    Activity Log
+                </button>
+            </nav>
+        </div>
+
+        <!-- Employees Tab -->
+        <div id="employeesContent" class="tab-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-semibold text-gray-800">Manage Employees</h2>
+                <button 
+                    onclick="showAddEmployeeModal()" 
+                    class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+                >
+                    Add Employee
+                </button>
+            </div>
+
+            <!-- Employee List -->
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                <div id="employeesList">
+                    <!-- Employee rows will be inserted here -->
+                </div>
+                <div id="employeesLoading" class="p-8 text-center text-gray-500">
+                    Loading employees...
+                </div>
+                <div id="employeesEmpty" class="p-8 text-center text-gray-500 hidden">
+                    No employees found. Add your first employee to get started.
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Tab -->
+        <div id="activityContent" class="tab-content hidden">
+            <h2 class="text-xl font-semibold text-gray-800 mb-6">Recent Activity</h2>
+            
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                <div id="activityList">
+                    <!-- Activity rows will be inserted here -->
+                </div>
+                <div id="activityLoading" class="p-8 text-center text-gray-500">
+                    Loading activity...
+                </div>
+                <div id="activityEmpty" class="p-8 text-center text-gray-500 hidden">
+                    No activity recorded yet.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Employee Modal -->
+    <div id="employeeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white p-8 rounded-lg max-w-md w-full mx-4 max-h-screen overflow-y-auto">
+            <h3 id="modalTitle" class="text-xl font-bold mb-4">Add Employee</h3>
+            <form id="employeeForm" enctype="multipart/form-data">
+                <input type="hidden" id="employeeId">
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Name *</label>
+                    <input 
+                        type="text" 
+                        id="employeeName"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required
+                    >
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Position</label>
+                    <input 
+                        type="text" 
+                        id="employeePosition"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Department</label>
+                    <input 
+                        type="text" 
+                        id="employeeDepartment"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Photo</label>
+                    <input 
+                        type="file" 
+                        id="employeePhoto"
+                        accept="image/*"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                    <p class="text-xs text-gray-500 mt-1">Max 5MB, image files only</p>
+                    <div id="currentPhoto" class="mt-2 hidden">
+                        <p class="text-sm text-gray-600 mb-2">Current photo:</p>
+                        <img id="currentPhotoImg" class="w-20 h-20 rounded-full object-cover" />
+                    </div>
+                </div>
+
+                <div class="flex space-x-4">
+                    <button 
+                        type="button" 
+                        onclick="closeEmployeeModal()"
+                        class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        type="submit"
+                        id="submitButton"
+                        class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    >
+                        Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let employees = [];
+        let activities = [];
+        let editingEmployeeId = null;
+
+        // Load data when page loads
+        loadEmployees();
+
+        // Tab management
+        function showTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active', 'border-blue-500', 'text-blue-600');
+                button.classList.add('border-transparent', 'text-gray-500');
+            });
+            
+            document.getElementById(tabName + 'Tab').classList.add('active', 'border-blue-500', 'text-blue-600');
+            document.getElementById(tabName + 'Tab').classList.remove('border-transparent', 'text-gray-500');
+
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            
+            document.getElementById(tabName + 'Content').classList.remove('hidden');
+
+            // Load data for the active tab
+            if (tabName === 'activity') {
+                loadActivity();
+            }
+        }
+
+        // Load employees
+        async function loadEmployees() {
+            try {
+                const response = await fetch('/api/employees');
+                employees = await response.json();
+                renderEmployees();
+                document.getElementById('employeesLoading').classList.add('hidden');
+            } catch (error) {
+                console.error('Error loading employees:', error);
+                document.getElementById('employeesLoading').innerHTML = '<p class="text-red-500">Error loading employees</p>';
+            }
+        }
+
+        // Render employees
+        function renderEmployees() {
+            const list = document.getElementById('employeesList');
+            const empty = document.getElementById('employeesEmpty');
+            
+            if (employees.length === 0) {
+                list.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+
+            empty.classList.add('hidden');
+            
+            list.innerHTML = employees.map(employee => `
+                <div class="border-b border-gray-200 p-4 flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <div class="flex-shrink-0">
+                            ${employee.photo 
+                                ? `<img src="${employee.photo}" alt="${employee.name}" class="w-12 h-12 rounded-full object-cover">`
+                                : `<div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center">
+                                     <span class="text-lg font-bold text-gray-600">${employee.name.charAt(0)}</span>
+                                   </div>`
+                            }
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900">${employee.name}</h3>
+                            <p class="text-sm text-gray-600">${employee.position || 'No position set'}</p>
+                            <p class="text-xs text-gray-500">${employee.department || 'No department set'}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button 
+                            onclick="editEmployee('${employee.id}')"
+                            class="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                        >
+                            Edit
+                        </button>
+                        <button 
+                            onclick="deleteEmployee('${employee.id}', '${employee.name}')"
+                            class="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
+                        >
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load activity
+        async function loadActivity() {
+            try {
+                const response = await fetch('/api/activity');
+                activities = await response.json();
+                renderActivity();
+                document.getElementById('activityLoading').classList.add('hidden');
+            } catch (error) {
+                console.error('Error loading activity:', error);
+                document.getElementById('activityLoading').innerHTML = '<p class="text-red-500">Error loading activity</p>';
+            }
+        }
+
+        // Render activity
+        function renderActivity() {
+            const list = document.getElementById('activityList');
+            const empty = document.getElementById('activityEmpty');
+            
+            if (activities.length === 0) {
+                list.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+
+            empty.classList.add('hidden');
+            
+            list.innerHTML = activities.map(activity => `
+                <div class="border-b border-gray-200 p-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">
+                                ${activity.guestName} visited ${activity.employeeName}
+                            </p>
+                            ${activity.message ? `<p class="text-sm text-gray-600 mt-1">"${activity.message}"</p>` : ''}
+                        </div>
+                        <span class="text-xs text-gray-500">
+                            ${new Date(activity.timestamp).toLocaleString()}
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Employee modal management
+        function showAddEmployeeModal() {
+            editingEmployeeId = null;
+            document.getElementById('modalTitle').textContent = 'Add Employee';
+            document.getElementById('submitButton').textContent = 'Add Employee';
+            document.getElementById('employeeForm').reset();
+            document.getElementById('employeeId').value = '';
+            document.getElementById('currentPhoto').classList.add('hidden');
+            document.getElementById('employeeModal').classList.remove('hidden');
+            document.getElementById('employeeName').focus();
+        }
+
+        function editEmployee(employeeId) {
+            const employee = employees.find(emp => emp.id === employeeId);
+            if (!employee) return;
+
+            editingEmployeeId = employeeId;
+            document.getElementById('modalTitle').textContent = 'Edit Employee';
+            document.getElementById('submitButton').textContent = 'Update Employee';
+            document.getElementById('employeeId').value = employee.id;
+            document.getElementById('employeeName').value = employee.name;
+            document.getElementById('employeePosition').value = employee.position || '';
+            document.getElementById('employeeDepartment').value = employee.department || '';
+            
+            if (employee.photo) {
+                document.getElementById('currentPhoto').classList.remove('hidden');
+                document.getElementById('currentPhotoImg').src = employee.photo;
+            } else {
+                document.getElementById('currentPhoto').classList.add('hidden');
+            }
+
+            document.getElementById('employeeModal').classList.remove('hidden');
+            document.getElementById('employeeName').focus();
+        }
+
+        function closeEmployeeModal() {
+            document.getElementById('employeeModal').classList.add('hidden');
+            document.getElementById('employeeForm').reset();
+            editingEmployeeId = null;
+        }
+
+        // Handle employee form submission
+        document.getElementById('employeeForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitButton = document.getElementById('submitButton');
+            const originalText = submitButton.textContent;
+            
+            submitButton.disabled = true;
+            submitButton.textContent = 'Saving...';
+
+            const formData = new FormData();
+            formData.append('name', document.getElementById('employeeName').value);
+            formData.append('position', document.getElementById('employeePosition').value);
+            formData.append('department', document.getElementById('employeeDepartment').value);
+            
+            const photoFile = document.getElementById('employeePhoto').files[0];
+            if (photoFile) {
+                formData.append('photo', photoFile);
+            }
+
+            try {
+                const url = editingEmployeeId ? `/api/employees/${editingEmployeeId}` : '/api/employees';
+                const method = editingEmployeeId ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    body: formData
+                });
+
+                if (response.ok) {
+                    closeEmployeeModal();
+                    await loadEmployees(); // Reload employees list
+                } else {
+                    const error = await response.json();
+                    alert('Error: ' + error.error);
+                }
+            } catch (error) {
+                console.error('Error saving employee:', error);
+                alert('Error saving employee. Please try again.');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = originalText;
+            }
+        });
+
+        // Delete employee
+        async function deleteEmployee(employeeId, employeeName) {
+            if (!confirm(`Are you sure you want to delete ${employeeName}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/employees/${employeeId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    await loadEmployees(); // Reload employees list
+                } else {
+                    const error = await response.json();
+                    alert('Error: ' + error.error);
+                }
+            } catch (error) {
+                console.error('Error deleting employee:', error);
+                alert('Error deleting employee. Please try again.');
+            }
+        }
+
+        // Logout
+        async function logout() {
+            try {
+                await fetch('/api/auth/logout', { method: 'POST' });
+                window.location.href = '/admin';
+            } catch (error) {
+                console.error('Logout error:', error);
+                window.location.href = '/admin';
+            }
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('employeeModal').addEventListener('click', function(e) {
+            if (e.target === this) closeEmployeeModal();
+        });
+    </script>
+</body>
+</html>

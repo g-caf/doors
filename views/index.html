@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guest Check-in System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Welcome</h1>
+            <p class="text-lg text-gray-600">Please select the person you're here to see</p>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="max-w-md mx-auto mb-8">
+            <input 
+                type="text" 
+                id="searchInput"
+                placeholder="Search for employee..."
+                class="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+        </div>
+
+        <!-- Employee Grid -->
+        <div id="employeeGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            <!-- Employee cards will be inserted here -->
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading" class="text-center py-8">
+            <p class="text-gray-500">Loading employees...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="text-center py-8 hidden">
+            <p class="text-gray-500">No employees found</p>
+        </div>
+    </div>
+
+    <!-- Notification Modal -->
+    <div id="notificationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white p-8 rounded-lg max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold mb-4">Notify Employee</h3>
+            <form id="notificationForm">
+                <input type="hidden" id="selectedEmployeeId">
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
+                    <input 
+                        type="text" 
+                        id="guestName"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required
+                    >
+                </div>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Message (Optional)</label>
+                    <textarea 
+                        id="guestMessage"
+                        rows="3"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="Additional message for the employee..."
+                    ></textarea>
+                </div>
+                <div class="flex space-x-4">
+                    <button 
+                        type="button" 
+                        onclick="closeModal()"
+                        class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+                    >
+                        Cancel
+                    </button>
+                    <button 
+                        type="submit"
+                        class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                    >
+                        Notify
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white p-8 rounded-lg max-w-md w-full mx-4 text-center">
+            <div class="mb-4">
+                <svg class="mx-auto h-12 w-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Notification Sent!</h3>
+            <p id="successMessage" class="text-gray-600 mb-4"></p>
+            <button 
+                onclick="closeSuccessModal()"
+                class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+                OK
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let employees = [];
+        let filteredEmployees = [];
+
+        // Load employees on page load
+        async function loadEmployees() {
+            try {
+                const response = await fetch('/api/employees');
+                employees = await response.json();
+                filteredEmployees = [...employees];
+                renderEmployees();
+                document.getElementById('loading').classList.add('hidden');
+            } catch (error) {
+                console.error('Error loading employees:', error);
+                document.getElementById('loading').innerHTML = '<p class="text-red-500">Error loading employees</p>';
+            }
+        }
+
+        // Render employee grid
+        function renderEmployees() {
+            const grid = document.getElementById('employeeGrid');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (filteredEmployees.length === 0) {
+                grid.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            
+            grid.innerHTML = filteredEmployees.map(employee => `
+                <div class="bg-white rounded-lg shadow-md p-4 text-center cursor-pointer hover:shadow-lg transition-shadow" 
+                     onclick="selectEmployee('${employee.id}', '${employee.name}')">
+                    <div class="mb-3">
+                        ${employee.photo 
+                            ? `<img src="${employee.photo}" alt="${employee.name}" class="w-20 h-20 rounded-full mx-auto object-cover">`
+                            : `<div class="w-20 h-20 rounded-full mx-auto bg-gray-300 flex items-center justify-center">
+                                 <span class="text-2xl font-bold text-gray-600">${employee.name.charAt(0)}</span>
+                               </div>`
+                        }
+                    </div>
+                    <h3 class="font-semibold text-lg text-gray-800 mb-1">${employee.name}</h3>
+                    <p class="text-sm text-gray-600">${employee.position || ''}</p>
+                    <p class="text-xs text-gray-500">${employee.department || ''}</p>
+                </div>
+            `).join('');
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            filteredEmployees = employees.filter(employee => 
+                employee.name.toLowerCase().includes(searchTerm) ||
+                (employee.department && employee.department.toLowerCase().includes(searchTerm)) ||
+                (employee.position && employee.position.toLowerCase().includes(searchTerm))
+            );
+            renderEmployees();
+        });
+
+        // Select employee
+        function selectEmployee(employeeId, employeeName) {
+            document.getElementById('selectedEmployeeId').value = employeeId;
+            document.getElementById('notificationModal').classList.remove('hidden');
+            document.getElementById('guestName').focus();
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('notificationModal').classList.add('hidden');
+            document.getElementById('notificationForm').reset();
+        }
+
+        // Close success modal
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.add('hidden');
+        }
+
+        // Handle notification form submission
+        document.getElementById('notificationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                employeeId: document.getElementById('selectedEmployeeId').value,
+                guestName: document.getElementById('guestName').value,
+                guestMessage: document.getElementById('guestMessage').value
+            };
+
+            try {
+                const response = await fetch('/api/notify', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    closeModal();
+                    document.getElementById('successMessage').textContent = result.message;
+                    document.getElementById('successModal').classList.remove('hidden');
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error sending notification:', error);
+                alert('Error sending notification. Please try again.');
+            }
+        });
+
+        // Close modals when clicking outside
+        document.getElementById('notificationModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        document.getElementById('successModal').addEventListener('click', function(e) {
+            if (e.target === this) closeSuccessModal();
+        });
+
+        // Load employees when page loads
+        loadEmployees();
+    </script>
+</body>
+</html>
