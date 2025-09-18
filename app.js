@@ -365,7 +365,7 @@ app.post('/api/notify', async (req, res) => {
   saveData();
 
   // Create Slack message
-  const slackMessage = `👋 Hi ${employee.name}! ${activity.guestName} is here to see you at the front desk.`;
+  const slackMessage = `👋 ${activity.guestName} is here to see ${employee.name}.`;
   
   let slackResult = { success: false, error: 'No Slack configuration' };
   
@@ -388,7 +388,7 @@ app.post('/api/notify', async (req, res) => {
       // Otherwise, send to default channel
       else {
         const defaultChannel = process.env.SLACK_DEFAULT_CHANNEL || 'C07V5SGFTLD'; // fallback channel ID
-        const channelMessage = `👋 ${activity.guestName} is here to see ${employee.name} at the front desk.`;
+        const channelMessage = `👋 ${activity.guestName} is here to see ${employee.name}.`;
         slackResult = await sendSlackChannelMessage(channelId || defaultChannel, channelMessage);
       }
     } catch (error) {
