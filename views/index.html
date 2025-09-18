@@ -6,17 +6,10 @@
     <title>Sourcegraph Guest Check-in</title>
     <link rel="icon" type="image/png" href="/public/favicon.png">
     
-    <!-- Preload critical images -->
+    <!-- Preload only critical images -->
     <link rel="preload" as="image" href="/public/BLANKSLATE.pdf.png">
     <link rel="preload" as="image" href="/public/primary-dark-mode.svg">
     <link rel="preload" as="image" href="/public/favicon.png">
-    
-    <!-- Preload employee photos -->
-    <link rel="preload" as="image" href="/public/Adrienne%20Caffarel.png">
-    <link rel="preload" as="image" href="/public/Beyang%20Liu.png">
-    <link rel="preload" as="image" href="/public/Dan%20Adler.png">
-    <link rel="preload" as="image" href="/public/Madison%20Clark.png">
-    <link rel="preload" as="image" href="/public/Quinn%20Slack.png">
     
     <style>
         * {
@@ -323,11 +316,22 @@
         
         /* Image loading states */
         .employee-photo {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.5);
             transition: opacity 0.3s ease;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 100%);
         }
         
         .employee-photo.loading {
-            opacity: 0.5;
+            opacity: 0.3;
+        }
+        
+        .employee-photo[src=""], .employee-photo:not([src]) {
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.3) 100%);
+            opacity: 0.3;
         }
     </style>
 </head>
@@ -418,13 +422,34 @@
             
             list.innerHTML = filtered.map(employee => `
                 <div class="dropdown-item" data-id="${employee.id}" data-name="${employee.name}" data-photo="${employee.photo_url || ''}">
-                    <img src="${employee.photo_url || ''}" alt="${employee.name}" class="employee-photo loading" 
-                         loading="eager" decoding="async"
-                         onload="this.classList.remove('loading')"
-                         onerror="this.style.display='none'">
+                    <img data-src="${employee.photo_url || ''}" alt="${employee.name}" class="employee-photo loading" 
+                         loading="lazy" decoding="async">
                     <span>${employee.name}</span>
                 </div>
             `).join('');
+            
+            // Lazy load images
+            document.querySelectorAll('.employee-photo[data-src]').forEach(img => {
+                const loadImage = () => {
+                    img.src = img.dataset.src;
+                    img.onload = () => img.classList.remove('loading');
+                    img.onerror = () => img.style.opacity = '0';
+                };
+                
+                if ('IntersectionObserver' in window) {
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                loadImage();
+                                observer.unobserve(entry.target);
+                            }
+                        });
+                    });
+                    observer.observe(img);
+                } else {
+                    loadImage(); // Fallback for old browsers
+                }
+            });
             
             // Add click listeners to dropdown items
             document.querySelectorAll('.dropdown-item').forEach(item => {
@@ -545,10 +570,17 @@
             }, 500);
         }
         
+        // Register Service Worker for caching
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/public/sw.js').catch(() => {
+                console.log('Service Worker registration failed');
+            });
+        }
+        
         // Initialize
         fetchEmployees().then(() => {
             // Wait a bit for images to load, then hide loading screen
-            setTimeout(hideLoadingScreen, 1000);
+            setTimeout(hideLoadingScreen, 500);
         });
     </script>
 </body>
