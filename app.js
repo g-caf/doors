@@ -343,7 +343,8 @@ app.delete('/api/employees/:id', (req, res) => {
 
 // Notify employee
 app.post('/api/notify', async (req, res) => {
-  const { employeeId, guestName, guestMessage, channelId } = req.body;
+  const { employeeId, guestName, guestMessage, visitorName, channelId } = req.body;
+  const actualGuestName = guestName || visitorName;
   
   const employee = employees.find(emp => emp.id === employeeId);
   if (!employee) {
@@ -355,7 +356,7 @@ app.post('/api/notify', async (req, res) => {
     id: Date.now().toString(),
     employeeId,
     employeeName: employee.name,
-    guestName: guestName || 'Guest',
+    guestName: actualGuestName || 'Guest',
     message: guestMessage || 'You have a visitor',
     timestamp: new Date().toISOString()
   };
