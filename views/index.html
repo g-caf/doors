@@ -5,13 +5,125 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guest Check-in System</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom brand colors and dark theme */
+        :root {
+            --brand-red: #ff5543;
+            --brand-white: #fcfcfc;
+            --dark-bg: #1a1a1a;
+            --card-bg: #2a2a2a;
+            --border-color: #404040;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: var(--brand-white);
+        }
+        
+        .employee-card {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        .employee-card:hover {
+            border-color: var(--brand-red);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(255, 85, 67, 0.3);
+        }
+        
+        .search-input {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            color: var(--brand-white);
+        }
+        .search-input:focus {
+            border-color: var(--brand-red);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 85, 67, 0.1);
+        }
+        .search-input::placeholder {
+            color: #999;
+        }
+        
+        .notify-btn {
+            background-color: var(--brand-red);
+            color: white;
+            font-weight: 600;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        .notify-btn:hover {
+            background-color: #e04435;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 85, 67, 0.4);
+        }
+        
+        .modal-bg {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        .modal-content {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+        }
+        
+        .form-input {
+            background-color: var(--dark-bg);
+            border: 2px solid var(--border-color);
+            color: var(--brand-white);
+        }
+        .form-input:focus {
+            border-color: var(--brand-red);
+            outline: none;
+        }
+        .form-input::placeholder {
+            color: #999;
+        }
+        
+        .btn-secondary {
+            background-color: var(--border-color);
+            color: var(--brand-white);
+            border: none;
+        }
+        .btn-secondary:hover {
+            background-color: #505050;
+        }
+        
+        .logo-container {
+            max-width: 300px;
+            margin: 0 auto;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="min-h-screen">
     <div class="container mx-auto px-4 py-8">
-        <!-- Header -->
+        <!-- Header with Logo -->
         <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-gray-800 mb-2">Welcome</h1>
-            <p class="text-lg text-gray-600">Please select the person you're here to see</p>
+            <div class="logo-container mb-6">
+                <svg viewBox="0 0 1190 158.67" class="w-full h-auto">
+                    <defs>
+                        <style>.cls-1{fill:#ff5543;}.cls-2{fill:#fcfcfc;}</style>
+                    </defs>
+                    <g>
+                        <path class="cls-1" d="M61.63,42.25l18.54,4.94L67.55,0l-21.38,5.75,7.62,28.62c1.02,3.84,4.03,6.86,7.85,7.88Z"/>
+                        <polygon class="cls-1" points="45.07 123.62 51.01 117.69 68.17 100.56 69.79 98.95 70.74 98.01 71.08 99.3 71.67 101.5 75.93 117.4 80.09 132.96 85.45 153 106.84 147.25 101.46 127.03 101.25 126.33 85.53 67.4 26.55 51.68 25.81 51.48 25.38 51.37 25.38 51.35 5.68 46.11 0 67.62 19.97 72.95 31 75.9 51.44 81.37 53.65 81.96 54.94 82.3 53.99 83.25 52.38 84.87 40.69 96.57 29.31 107.96 14.67 122.61 30.3 138.37 45.07 123.62"/>
+                        <path class="cls-1" d="M105.7,72.74l4.97,18.62c1.02,3.84,4.04,6.86,7.86,7.87l28.79,7.65,5.68-21.5-47.3-12.64Z"/>
+                        <path class="cls-1" d="M122.7,14.63l-18.41,18.37c-2.03,2.03-3.19,4.73-3.26,7.61l-.29,11.66,10.37.38c.13,0,.27,0,.4,0,2.95,0,5.72-1.15,7.81-3.24l19-19.02-15.62-15.76Z"/>
+                        <path class="cls-2" d="M261.18,68.36c-6.54-2.75-14.72-5.05-24.54-6.89-6.7-1.4-11.72-2.64-15.07-3.72-3.35-1.08-5.83-2.46-7.45-4.13-1.62-1.67-2.43-3.97-2.43-6.88,0-3.46.94-6.13,2.83-8.02s4.46-3.21,7.7-3.97c3.24-.75,7.29-1.13,12.15-1.13,5.83,0,11.64.7,17.42,2.11,5.78,1.41,12.01,3.62,18.71,6.64l3.56-20.09c-6.05-2.92-12.39-5.08-19.04-6.48-6.64-1.4-13.53-2.11-20.65-2.11-8.53,0-16.31,1.32-23.33,3.97-7.02,2.65-12.64,6.48-16.85,11.5-4.21,5.02-6.32,11.15-6.32,18.39,0,6.37,1.62,11.72,4.86,16.04,3.24,4.32,7.99,7.8,14.26,10.45,6.26,2.65,14.26,4.83,23.98,6.56,6.91,1.41,12.09,2.67,15.55,3.81,3.46,1.13,6.16,2.7,8.1,4.7,1.94,2,2.92,4.89,2.92,8.67,0,3.46-1.11,6.18-3.32,8.18-2.21,2-5.13,3.35-8.75,4.05-3.62.7-7.97,1.05-13.04,1.05-7.02,0-14.72-.92-23.08-2.75-8.37-1.83-15.58-4.32-21.63-7.45l-2.11,19.93c5.83,3.35,12.82,5.89,20.98,7.61,8.15,1.73,16.87,2.59,26.16,2.59s16.95-1.32,24.3-3.97c7.34-2.64,13.2-6.53,17.58-11.66,4.37-5.13,6.56-11.37,6.56-18.71,0-6.8-1.7-12.53-5.1-17.17-3.4-4.64-8.37-8.34-14.9-11.1Z"/>
+                        <path class="cls-2" d="M362.03,44.22c-7.45-3.94-15.77-5.91-24.95-5.91s-17.77,1.97-25.11,5.91c-7.35,3.94-13.1,9.45-17.25,16.52-4.16,7.08-6.24,15.04-6.24,23.9s2.05,16.63,6.16,23.65c4.1,7.02,9.85,12.56,17.25,16.61,7.4,4.05,15.79,6.08,25.19,6.08s17.5-2.03,24.95-6.08c7.45-4.05,13.26-9.61,17.42-16.69,4.16-7.07,6.24-14.98,6.24-23.73s-2.08-16.79-6.24-23.81c-4.16-7.02-9.96-12.5-17.42-16.44ZM360.57,98.73c-2.27,4.11-5.46,7.32-9.56,9.64-4.11,2.32-8.7,3.48-13.77,3.48s-9.99-1.16-14.09-3.48c-4.11-2.32-7.35-5.56-9.72-9.72-2.38-4.16-3.56-8.94-3.56-14.34s1.19-10.1,3.56-14.09c2.38-3.99,5.62-7.13,9.72-9.4,4.1-2.27,8.75-3.4,13.93-3.4s9.83,1.13,13.93,3.4c4.1,2.27,7.29,5.46,9.56,9.56,2.27,4.11,3.4,8.86,3.4,14.26s-1.13,9.99-3.4,14.09Z"/>
+                        <path class="cls-2" d="M461.33,92.96c-.41,1.08-.86,2.14-1.38,3.18-2.32,4.64-5.54,8.32-9.64,11.02-4.11,2.7-8.69,4.05-13.77,4.05-6.7,0-11.69-1.81-14.98-5.43-3.3-3.62-4.94-8.77-4.94-15.47v-50.22h-21.54v53.46c0,7.56,1.51,14.15,4.54,19.76,3.02,5.62,7.23,9.94,12.64,12.96,5.4,3.02,11.61,4.54,18.63,4.54,10.58,0,18.96-2.7,25.11-8.1,2.02-1.77,3.78-3.71,5.35-5.81v12.13h21.54V40.09h-21.54v52.87Z"/>
+                        <path class="cls-2" d="M542.49,38.47c-10.15,0-17.77,3.35-22.84,10.04-1.2,1.59-2.28,3.36-3.24,5.31v-13.73h-21.55v88.94h21.55v-36.61c0-9.93,2.13-17.9,6.4-23.89,4.26-5.99,10.07-8.99,17.41-8.99h5.35c1.08.11,2.05.16,2.92.16h2.59l2.43-20.09c-3.78-.75-7.45-1.13-11.02-1.13Z"/>
+                        <path class="cls-2" d="M588.58,60.58c4.16-2.21,8.88-3.32,14.18-3.32,4.32,0,8.37.65,12.15,1.94,3.78,1.3,7.61,3.4,11.5,6.32l8.91-16.04c-5.29-3.89-10.69-6.72-16.2-8.5-5.51-1.78-11.56-2.67-18.14-2.67-8.75,0-16.74,1.92-23.98,5.75-7.24,3.83-12.96,9.29-17.17,16.36-4.21,7.08-6.32,15.15-6.32,24.22s2.05,17.09,6.16,24.06c4.1,6.97,9.8,12.37,17.09,16.2,7.29,3.83,15.31,5.75,24.06,5.75,6.69,0,12.66-.84,17.9-2.51,5.24-1.67,10.77-4.46,16.6-8.34l-8.59-15.71c-3.89,2.59-7.8,4.56-11.75,5.91-3.94,1.35-7.97,2.03-12.07,2.03-5.29,0-10.04-1.08-14.26-3.24-4.21-2.16-7.53-5.32-9.96-9.48-2.43-4.16-3.65-9.04-3.65-14.66s1.21-10.61,3.65-14.66c2.43-4.05,5.72-7.18,9.88-9.4Z"/>
+                        <path class="cls-2" d="M704.68,39.74c-5.89,0-11.64,1.08-17.25,3.24-5.62,2.16-10.91,5.4-15.87,9.72V40.09h-21.55v88.94h21.55v-39.18c0-7.78,1.59-14.42,4.78-19.92,3.19-5.51,7.4-9.69,12.64-12.56,5.24-2.86,10.88-4.29,16.93-4.29,5.51,0,9.93,1.35,13.28,4.05,3.35,2.7,5.02,6.64,5.02,11.82v59.09h21.55v-62.65c0-8.64-1.73-15.63-5.18-20.98-3.46-5.35-8.02-9.26-13.69-11.74-5.67-2.48-11.64-3.72-17.9-3.72Z"/>
+                        <path class="cls-2" d="M826.28,107.48c-5.29,0-10.04-1.08-14.26-3.24-4.21-2.16-7.53-5.32-9.96-9.48-2.43-4.16-3.65-9.04-3.65-14.66s1.21-10.61,3.65-14.66c2.43-4.05,5.75-7.18,9.96-9.4,4.21-2.21,8.96-3.32,14.26-3.32s10.04,1.11,14.26,3.32c4.21,2.21,7.53,5.35,9.96,9.4,2.43,4.05,3.65,8.99,3.65,14.82s-1.21,10.69-3.65,14.5c-2.43,3.81-5.75,6.86-9.96,9.16-4.21,2.3-8.96,3.45-14.26,3.45Zm0,22.35c9.07,0,17.17-1.97,24.3-5.91,7.13-3.94,12.66-9.45,16.61-16.52,3.94-7.08,5.91-15.12,5.91-24.14s-1.97-16.95-5.91-23.98c-3.94-7.02-9.48-12.5-16.61-16.44-7.13-3.94-15.23-5.91-24.3-5.91s-17.17,1.97-24.3,5.91c-7.13,3.94-12.69,9.42-16.69,16.44-4,7.02-6,15.04-6,24.06s2,17.09,6,24.06c4,6.97,9.56,12.45,16.69,16.36,7.13,3.91,15.23,5.86,24.3,5.86Z"/>
+                        <path class="cls-2" d="M946.86,92.96c-.41,1.08-.86,2.14-1.38,3.18-2.32,4.64-5.54,8.32-9.64,11.02-4.11,2.7-8.69,4.05-13.77,4.05-6.7,0-11.69-1.81-14.98-5.43-3.3-3.62-4.94-8.77-4.94-15.47v-50.22h-21.54v53.46c0,7.56,1.51,14.15,4.54,19.76,3.02,5.62,7.23,9.94,12.64,12.96,5.4,3.02,11.61,4.54,18.63,4.54,10.58,0,18.96-2.7,25.11-8.1,2.02-1.77,3.78-3.71,5.35-5.81v12.13h21.54V40.09h-21.54v52.87Z"/>
+                        <path class="cls-2" d="M1028.02,38.47c-10.15,0-17.77,3.35-22.84,10.04-1.2,1.59-2.28,3.36-3.24,5.31v-13.73h-21.55v88.94h21.55v-36.61c0-9.93,2.13-17.9,6.4-23.89,4.26-5.99,10.07-8.99,17.41-8.99h5.35c1.08.11,2.05.16,2.92.16h2.59l2.43-20.09c-3.78-.75-7.45-1.13-11.02-1.13Z"/>
+                        <path class="cls-2" d="M1120.87,107.48c-5.29,0-10.04-1.08-14.26-3.24-4.21-2.16-7.53-5.32-9.96-9.48-2.43-4.16-3.65-9.04-3.65-14.66s1.21-10.61,3.65-14.66c2.43-4.05,5.75-7.18,9.96-9.4,4.21-2.21,8.96-3.32,14.26-3.32s10.04,1.11,14.26,3.32c4.21,2.21,7.53,5.35,9.96,9.4,2.43,4.05,3.65,8.99,3.65,14.82s-1.21,10.69-3.65,14.5c-2.43,3.81-5.75,6.86-9.96,9.16-4.21,2.3-8.96,3.45-14.26,3.45Zm0,22.35c9.07,0,17.17-1.97,24.3-5.91,7.13-3.94,12.66-9.45,16.61-16.52,3.94-7.08,5.91-15.12,5.91-24.14s-1.97-16.95-5.91-23.98c-3.94-7.02-9.48-12.5-16.61-16.44-7.13-3.94-15.23-5.91-24.3-5.91s-17.17,1.97-24.3,5.91c-7.13,3.94-12.69,9.42-16.69,16.44-4,7.02-6,15.04-6,24.06s2,17.09,6,24.06c4,6.97,9.56,12.45,16.69,16.36,7.13,3.91,15.23,5.86,24.3,5.86Z"/>
+                        <path class="cls-2" d="M1190,40.09h-21.55v88.94h21.55V40.09Z"/>
+                    </g>
+                </svg>
+            </div>
+            <h1 class="text-4xl font-bold mb-2" style="color: var(--brand-white);">Welcome</h1>
+            <p class="text-xl" style="color: #ccc;">Please select the person you're here to see</p>
         </div>
 
         <!-- Search Bar -->
@@ -20,7 +132,7 @@
                 type="text" 
                 id="searchInput"
                 placeholder="Search for employee..."
-                class="w-full px-4 py-3 text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                class="search-input w-full px-6 py-4 text-lg rounded-lg"
             >
         </div>
 
@@ -31,52 +143,53 @@
 
         <!-- Loading State -->
         <div id="loading" class="text-center py-8">
-            <p class="text-gray-500">Loading employees...</p>
+            <p class="text-gray-400">Loading employees...</p>
         </div>
 
         <!-- Empty State -->
         <div id="emptyState" class="text-center py-8 hidden">
-            <p class="text-gray-500">No employees found</p>
+            <p class="text-gray-400">No employees found</p>
         </div>
     </div>
 
     <!-- Notification Modal -->
-    <div id="notificationModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-        <div class="bg-white p-8 rounded-lg max-w-md w-full mx-4">
-            <h3 class="text-xl font-bold mb-4">Notify Employee</h3>
+    <div id="notificationModal" class="modal-bg fixed inset-0 flex items-center justify-center hidden z-50">
+        <div class="modal-content p-8 rounded-lg max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold mb-4" style="color: var(--brand-white);">Notify Employee</h3>
             <form id="notificationForm">
                 <input type="hidden" id="selectedEmployeeId">
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
+                    <label class="block text-sm font-medium mb-2" style="color: var(--brand-white);">Your Name</label>
                     <input 
                         type="text" 
-                        id="guestName"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
+                        id="visitorName" 
+                        required 
+                        class="form-input w-full px-4 py-2 rounded-lg"
+                        placeholder="Enter your name"
                     >
                 </div>
                 <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Message (Optional)</label>
+                    <label class="block text-sm font-medium mb-2" style="color: var(--brand-white);">Message (optional)</label>
                     <textarea 
-                        id="guestMessage"
-                        rows="3"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Additional message for the employee..."
+                        id="visitorMessage" 
+                        rows="3" 
+                        class="form-input w-full px-4 py-2 rounded-lg"
+                        placeholder="Additional message..."
                     ></textarea>
                 </div>
-                <div class="flex space-x-4">
+                <div class="flex gap-4">
                     <button 
                         type="button" 
-                        onclick="closeModal()"
-                        class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
+                        onclick="closeModal()" 
+                        class="btn-secondary flex-1 px-6 py-3 rounded-lg font-medium"
                     >
                         Cancel
                     </button>
                     <button 
-                        type="submit"
-                        class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                        type="submit" 
+                        class="notify-btn flex-1 px-6 py-3 rounded-lg"
                     >
-                        Notify
+                        Send Notification
                     </button>
                 </div>
             </form>
@@ -84,18 +197,18 @@
     </div>
 
     <!-- Success Modal -->
-    <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-        <div class="bg-white p-8 rounded-lg max-w-md w-full mx-4 text-center">
-            <div class="mb-4">
-                <svg class="mx-auto h-12 w-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div id="successModal" class="modal-bg fixed inset-0 flex items-center justify-center hidden z-50">
+        <div class="modal-content p-8 rounded-lg max-w-md w-full mx-4 text-center">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500 flex items-center justify-center">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                 </svg>
             </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-2">Notification Sent!</h3>
-            <p id="successMessage" class="text-gray-600 mb-4"></p>
+            <h3 class="text-xl font-bold mb-2" style="color: var(--brand-white);">Notification Sent!</h3>
+            <p class="mb-6" style="color: #ccc;">The employee has been notified of your arrival.</p>
             <button 
-                onclick="closeSuccessModal()"
-                class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                onclick="closeSuccessModal()" 
+                class="notify-btn px-8 py-3 rounded-lg"
             >
                 OK
             </button>
@@ -104,49 +217,49 @@
 
     <script>
         let employees = [];
-        let filteredEmployees = [];
+        let isRateLimited = false;
 
-        // Load employees on page load
-        async function loadEmployees() {
+        // Fetch employees from API
+        async function fetchEmployees() {
             try {
                 const response = await fetch('/api/employees');
-                employees = await response.json();
-                filteredEmployees = [...employees];
-                renderEmployees();
-                document.getElementById('loading').classList.add('hidden');
+                const data = await response.json();
+                employees = data.employees || [];
+                renderEmployees(employees);
+                document.getElementById('loading').style.display = 'none';
             } catch (error) {
-                console.error('Error loading employees:', error);
-                document.getElementById('loading').innerHTML = '<p class="text-red-500">Error loading employees</p>';
+                console.error('Error fetching employees:', error);
+                document.getElementById('loading').innerHTML = '<p class="text-red-400">Error loading employees</p>';
             }
         }
 
         // Render employee grid
-        function renderEmployees() {
+        function renderEmployees(employeesToRender) {
             const grid = document.getElementById('employeeGrid');
             const emptyState = document.getElementById('emptyState');
             
-            if (filteredEmployees.length === 0) {
+            if (employeesToRender.length === 0) {
                 grid.innerHTML = '';
                 emptyState.classList.remove('hidden');
                 return;
             }
-
+            
             emptyState.classList.add('hidden');
             
-            grid.innerHTML = filteredEmployees.map(employee => `
-                <div class="bg-white rounded-lg shadow-md p-4 text-center cursor-pointer hover:shadow-lg transition-shadow" 
-                     onclick="selectEmployee('${employee.id}', '${employee.name}')">
-                    <div class="mb-3">
-                        ${employee.photo 
-                            ? `<img src="${employee.photo}" alt="${employee.name}" class="w-20 h-20 rounded-full mx-auto object-cover">`
-                            : `<div class="w-20 h-20 rounded-full mx-auto bg-gray-300 flex items-center justify-center">
-                                 <span class="text-2xl font-bold text-gray-600">${employee.name.charAt(0)}</span>
-                               </div>`
+            grid.innerHTML = employeesToRender.map(employee => `
+                <div class="employee-card rounded-lg p-6 text-center cursor-pointer" 
+                     onclick="selectEmployee(${employee.id}, '${employee.name}')">
+                    <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gray-600 flex items-center justify-center">
+                        ${employee.photo_url ? 
+                            `<img src="${employee.photo_url}" alt="${employee.name}" class="w-full h-full rounded-full object-cover">` : 
+                            `<span class="text-2xl font-bold" style="color: var(--brand-white);">${employee.name.charAt(0)}</span>`
                         }
                     </div>
-                    <h3 class="font-semibold text-lg text-gray-800 mb-1">${employee.name}</h3>
-                    <p class="text-sm text-gray-600">${employee.position || ''}</p>
-                    <p class="text-xs text-gray-500">${employee.department || ''}</p>
+                    <h3 class="font-semibold text-lg mb-2" style="color: var(--brand-white);">${employee.name}</h3>
+                    <p class="text-sm mb-4" style="color: #ccc;">${employee.department || 'Employee'}</p>
+                    <button class="notify-btn w-full py-2 rounded-lg">
+                        Notify
+                    </button>
                 </div>
             `).join('');
         }
@@ -154,19 +267,17 @@
         // Search functionality
         document.getElementById('searchInput').addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
-            filteredEmployees = employees.filter(employee => 
+            const filtered = employees.filter(employee => 
                 employee.name.toLowerCase().includes(searchTerm) ||
-                (employee.department && employee.department.toLowerCase().includes(searchTerm)) ||
-                (employee.position && employee.position.toLowerCase().includes(searchTerm))
+                (employee.department && employee.department.toLowerCase().includes(searchTerm))
             );
-            renderEmployees();
+            renderEmployees(filtered);
         });
 
-        // Select employee
+        // Select employee and show modal
         function selectEmployee(employeeId, employeeName) {
             document.getElementById('selectedEmployeeId').value = employeeId;
             document.getElementById('notificationModal').classList.remove('hidden');
-            document.getElementById('guestName').focus();
         }
 
         // Close modal
@@ -180,51 +291,61 @@
             document.getElementById('successModal').classList.add('hidden');
         }
 
-        // Handle notification form submission
+        // Handle form submission
         document.getElementById('notificationForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const formData = {
-                employeeId: document.getElementById('selectedEmployeeId').value,
-                guestName: document.getElementById('guestName').value,
-                guestMessage: document.getElementById('guestMessage').value
-            };
-
+            if (isRateLimited) {
+                alert('Please wait before sending another notification.');
+                return;
+            }
+            
+            const employeeId = document.getElementById('selectedEmployeeId').value;
+            const visitorName = document.getElementById('visitorName').value;
+            const message = document.getElementById('visitorMessage').value;
+            
             try {
+                isRateLimited = true;
+                setTimeout(() => { isRateLimited = false; }, 30000); // 30 second rate limit
+                
                 const response = await fetch('/api/notify', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify(formData)
+                    body: JSON.stringify({
+                        employeeId: parseInt(employeeId),
+                        visitorName,
+                        message
+                    })
                 });
-
+                
                 const result = await response.json();
                 
                 if (response.ok) {
                     closeModal();
-                    document.getElementById('successMessage').textContent = result.message;
                     document.getElementById('successModal').classList.remove('hidden');
                 } else {
-                    alert('Error: ' + result.error);
+                    alert(result.error || 'Failed to send notification');
+                    isRateLimited = false;
                 }
             } catch (error) {
                 console.error('Error sending notification:', error);
-                alert('Error sending notification. Please try again.');
+                alert('Failed to send notification. Please try again.');
+                isRateLimited = false;
             }
         });
 
+        // Initialize
+        fetchEmployees();
+
         // Close modals when clicking outside
-        document.getElementById('notificationModal').addEventListener('click', function(e) {
-            if (e.target === this) closeModal();
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal-bg')) {
+                closeModal();
+                closeSuccessModal();
+            }
         });
-
-        document.getElementById('successModal').addEventListener('click', function(e) {
-            if (e.target === this) closeSuccessModal();
-        });
-
-        // Load employees when page loads
-        loadEmployees();
     </script>
 </body>
 </html>

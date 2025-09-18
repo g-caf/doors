@@ -5,150 +5,330 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - Guest Check-in System</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom brand colors and dark theme */
+        :root {
+            --brand-red: #ff5543;
+            --brand-white: #fcfcfc;
+            --dark-bg: #1a1a1a;
+            --card-bg: #2a2a2a;
+            --border-color: #404040;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: var(--brand-white);
+        }
+        
+        .nav-bar {
+            background-color: var(--card-bg);
+            border-bottom: 2px solid var(--brand-red);
+        }
+        
+        .nav-link {
+            color: var(--brand-white);
+            padding: 12px 20px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--brand-red);
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+        }
+        
+        .form-input {
+            background-color: var(--dark-bg);
+            border: 2px solid var(--border-color);
+            color: var(--brand-white);
+        }
+        .form-input:focus {
+            border-color: var(--brand-red);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 85, 67, 0.1);
+        }
+        .form-input::placeholder {
+            color: #999;
+        }
+        
+        .btn-primary {
+            background-color: var(--brand-red);
+            color: white;
+            font-weight: 600;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #e04435;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 85, 67, 0.3);
+        }
+        
+        .btn-secondary {
+            background-color: var(--border-color);
+            color: var(--brand-white);
+            border: 2px solid var(--border-color);
+            font-weight: 600;
+        }
+        .btn-secondary:hover {
+            background-color: #505050;
+            border-color: #505050;
+        }
+        
+        .btn-danger {
+            background-color: #dc2626;
+            color: white;
+            border: none;
+            font-weight: 600;
+        }
+        .btn-danger:hover {
+            background-color: #b91c1c;
+        }
+        
+        .modal-bg {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        .modal-content {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+        }
+        
+        .table-container {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .table-header {
+            background-color: var(--dark-bg);
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .table-row:hover {
+            background-color: rgba(255, 85, 67, 0.1);
+        }
+        
+        .logo-container {
+            max-width: 200px;
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, var(--card-bg) 0%, #333 100%);
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        .stats-card:hover {
+            border-color: var(--brand-red);
+            transform: translateY(-2px);
+        }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
-    <!-- Header -->
-    <header class="bg-white shadow-sm border-b">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-gray-800">Admin Dashboard</h1>
-            <div class="flex items-center space-x-4">
-                <a href="/" class="text-blue-600 hover:text-blue-800">View Kiosk</a>
-                <button onclick="logout()" class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700">
-                    Logout
-                </button>
+<body class="min-h-screen">
+    <!-- Navigation -->
+    <nav class="nav-bar px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="logo-container">
+                <svg viewBox="0 0 1190 158.67" class="h-8 w-auto">
+                    <defs>
+                        <style>.cls-1{fill:#ff5543;}.cls-2{fill:#fcfcfc;}</style>
+                    </defs>
+                    <g>
+                        <path class="cls-1" d="M61.63,42.25l18.54,4.94L67.55,0l-21.38,5.75,7.62,28.62c1.02,3.84,4.03,6.86,7.85,7.88Z"/>
+                        <polygon class="cls-1" points="45.07 123.62 51.01 117.69 68.17 100.56 69.79 98.95 70.74 98.01 71.08 99.3 71.67 101.5 75.93 117.4 80.09 132.96 85.45 153 106.84 147.25 101.46 127.03 101.25 126.33 85.53 67.4 26.55 51.68 25.81 51.48 25.38 51.37 25.38 51.35 5.68 46.11 0 67.62 19.97 72.95 31 75.9 51.44 81.37 53.65 81.96 54.94 82.3 53.99 83.25 52.38 84.87 40.69 96.57 29.31 107.96 14.67 122.61 30.3 138.37 45.07 123.62"/>
+                        <path class="cls-1" d="M105.7,72.74l4.97,18.62c1.02,3.84,4.04,6.86,7.86,7.87l28.79,7.65,5.68-21.5-47.3-12.64Z"/>
+                        <path class="cls-1" d="M122.7,14.63l-18.41,18.37c-2.03,2.03-3.19,4.73-3.26,7.61l-.29,11.66,10.37.38c.13,0,.27,0,.4,0,2.95,0,5.72-1.15,7.81-3.24l19-19.02-15.62-15.76Z"/>
+                        <path class="cls-2" d="M261.18,68.36c-6.54-2.75-14.72-5.05-24.54-6.89-6.7-1.4-11.72-2.64-15.07-3.72-3.35-1.08-5.83-2.46-7.45-4.13-1.62-1.67-2.43-3.97-2.43-6.88,0-3.46.94-6.13,2.83-8.02s4.46-3.21,7.7-3.97c3.24-.75,7.29-1.13,12.15-1.13,5.83,0,11.64.7,17.42,2.11,5.78,1.41,12.01,3.62,18.71,6.64l3.56-20.09c-6.05-2.92-12.39-5.08-19.04-6.48-6.64-1.4-13.53-2.11-20.65-2.11-8.53,0-16.31,1.32-23.33,3.97-7.02,2.65-12.64,6.48-16.85,11.5-4.21,5.02-6.32,11.15-6.32,18.39,0,6.37,1.62,11.72,4.86,16.04,3.24,4.32,7.99,7.8,14.26,10.45,6.26,2.65,14.26,4.83,23.98,6.56,6.91,1.41,12.09,2.67,15.55,3.81,3.46,1.13,6.16,2.7,8.1,4.7,1.94,2,2.92,4.89,2.92,8.67,0,3.46-1.11,6.18-3.32,8.18-2.21,2-5.13,3.35-8.75,4.05-3.62.7-7.97,1.05-13.04,1.05-7.02,0-14.72-.92-23.08-2.75-8.37-1.83-15.58-4.32-21.63-7.45l-2.11,19.93c5.83,3.35,12.82,5.89,20.98,7.61,8.15,1.73,16.87,2.59,26.16,2.59s16.95-1.32,24.3-3.97c7.34-2.64,13.2-6.53,17.58-11.66,4.37-5.13,6.56-11.37,6.56-18.71,0-6.8-1.7-12.53-5.1-17.17-3.4-4.64-8.37-8.34-14.9-11.1Z"/>
+                        <path class="cls-2" d="M362.03,44.22c-7.45-3.94-15.77-5.91-24.95-5.91s-17.77,1.97-25.11,5.91c-7.35,3.94-13.1,9.45-17.25,16.52-4.16,7.08-6.24,15.04-6.24,23.9s2.05,16.63,6.16,23.65c4.1,7.02,9.85,12.56,17.25,16.61,7.4,4.05,15.79,6.08,25.19,6.08s17.5-2.03,24.95-6.08c7.45-4.05,13.26-9.61,17.42-16.69,4.16-7.07,6.24-14.98,6.24-23.73s-2.08-16.79-6.24-23.81c-4.16-7.02-9.96-12.5-17.42-16.44ZM360.57,98.73c-2.27,4.11-5.46,7.32-9.56,9.64-4.11,2.32-8.7,3.48-13.77,3.48s-9.99-1.16-14.09-3.48c-4.11-2.32-7.35-5.56-9.72-9.72-2.38-4.16-3.56-8.94-3.56-14.34s1.19-10.1,3.56-14.09c2.38-3.99,5.62-7.13,9.72-9.4,4.1-2.27,8.75-3.4,13.93-3.4s9.83,1.13,13.93,3.4c4.1,2.27,7.29,5.46,9.56,9.56,2.27,4.11,3.4,8.86,3.4,14.26s-1.13,9.99-3.4,14.09Z"/>
+                        <path class="cls-2" d="M461.33,92.96c-.41,1.08-.86,2.14-1.38,3.18-2.32,4.64-5.54,8.32-9.64,11.02-4.11,2.7-8.69,4.05-13.77,4.05-6.7,0-11.69-1.81-14.98-5.43-3.3-3.62-4.94-8.77-4.94-15.47v-50.22h-21.54v53.46c0,7.56,1.51,14.15,4.54,19.76,3.02,5.62,7.23,9.94,12.64,12.96,5.4,3.02,11.61,4.54,18.63,4.54,10.58,0,18.96-2.7,25.11-8.1,2.02-1.77,3.78-3.71,5.35-5.81v12.13h21.54V40.09h-21.54v52.87Z"/>
+                        <path class="cls-2" d="M542.49,38.47c-10.15,0-17.77,3.35-22.84,10.04-1.2,1.59-2.28,3.36-3.24,5.31v-13.73h-21.55v88.94h21.55v-36.61c0-9.93,2.13-17.9,6.4-23.89,4.26-5.99,10.07-8.99,17.41-8.99h5.35c1.08.11,2.05.16,2.92.16h2.59l2.43-20.09c-3.78-.75-7.45-1.13-11.02-1.13Z"/>
+                        <path class="cls-2" d="M588.58,60.58c4.16-2.21,8.88-3.32,14.18-3.32,4.32,0,8.37.65,12.15,1.94,3.78,1.3,7.61,3.4,11.5,6.32l8.91-16.04c-5.29-3.89-10.69-6.72-16.2-8.5-5.51-1.78-11.56-2.67-18.14-2.67-8.75,0-16.74,1.92-23.98,5.75-7.24,3.83-12.96,9.29-17.17,16.36-4.21,7.08-6.32,15.15-6.32,24.22s2.05,17.09,6.16,24.06c4.1,6.97,9.8,12.37,17.09,16.2,7.29,3.83,15.31,5.75,24.06,5.75,6.69,0,12.66-.84,17.9-2.51,5.24-1.67,10.77-4.46,16.6-8.34l-8.59-15.71c-3.89,2.59-7.8,4.56-11.75,5.91-3.94,1.35-7.97,2.03-12.07,2.03-5.29,0-10.04-1.08-14.26-3.24-4.21-2.16-7.53-5.32-9.96-9.48-2.43-4.16-3.65-9.04-3.65-14.66s1.21-10.61,3.65-14.66c2.43-4.05,5.72-7.18,9.88-9.4Z"/>
+                        <path class="cls-2" d="M704.68,39.74c-5.89,0-11.64,1.08-17.25,3.24-5.62,2.16-10.91,5.4-15.87,9.72V40.09h-21.55v88.94h21.55v-39.18c0-7.78,1.59-14.42,4.78-19.92,3.19-5.51,7.4-9.69,12.64-12.56,5.24-2.86,10.88-4.29,16.93-4.29,5.51,0,9.93,1.35,13.28,4.05,3.35,2.7,5.02,6.64,5.02,11.82v59.09h21.55v-62.65c0-8.64-1.73-15.63-5.18-20.98-3.46-5.35-8.02-9.26-13.69-11.74-5.67-2.48-11.64-3.72-17.9-3.72Z"/>
+                        <path class="cls-2" d="M826.28,107.48c-5.29,0-10.04-1.08-14.26-3.24-4.21-2.16-7.53-5.32-9.96-9.48-2.43-4.16-3.65-9.04-3.65-14.66s1.21-10.61,3.65-14.66c2.43-4.05,5.75-7.18,9.96-9.4,4.21-2.21,8.96-3.32,14.26-3.32s10.04,1.11,14.26,3.32c4.21,2.21,7.53,5.35,9.96,9.4,2.43,4.05,3.65,8.99,3.65,14.82s-1.21,10.69-3.65,14.5c-2.43,3.81-5.75,6.86-9.96,9.16-4.21,2.3-8.96,3.45-14.26,3.45Zm0,22.35c9.07,0,17.17-1.97,24.3-5.91,7.13-3.94,12.66-9.45,16.61-16.52,3.94-7.08,5.91-15.12,5.91-24.14s-1.97-16.95-5.91-23.98c-3.94-7.02-9.48-12.5-16.61-16.44-7.13-3.94-15.23-5.91-24.3-5.91s-17.17,1.97-24.3,5.91c-7.13,3.94-12.69,9.42-16.69,16.44-4,7.02-6,15.04-6,24.06s2,17.09,6,24.06c4,6.97,9.56,12.45,16.69,16.36,7.13,3.91,15.23,5.86,24.3,5.86Z"/>
+                        <path class="cls-2" d="M946.86,92.96c-.41,1.08-.86,2.14-1.38,3.18-2.32,4.64-5.54,8.32-9.64,11.02-4.11,2.7-8.69,4.05-13.77,4.05-6.7,0-11.69-1.81-14.98-5.43-3.3-3.62-4.94-8.77-4.94-15.47v-50.22h-21.54v53.46c0,7.56,1.51,14.15,4.54,19.76,3.02,5.62,7.23,9.94,12.64,12.96,5.4,3.02,11.61,4.54,18.63,4.54,10.58,0,18.96-2.7,25.11-8.1,2.02-1.77,3.78-3.71,5.35-5.81v12.13h21.54V40.09h-21.54v52.87Z"/>
+                        <path class="cls-2" d="M1028.02,38.47c-10.15,0-17.77,3.35-22.84,10.04-1.2,1.59-2.28,3.36-3.24,5.31v-13.73h-21.55v88.94h21.55v-36.61c0-9.93,2.13-17.9,6.4-23.89,4.26-5.99,10.07-8.99,17.41-8.99h5.35c1.08.11,2.05.16,2.92.16h2.59l2.43-20.09c-3.78-.75-7.45-1.13-11.02-1.13Z"/>
+                        <path class="cls-2" d="M1120.87,107.48c-5.29,0-10.04-1.08-14.26-3.24-4.21-2.16-7.53-5.32-9.96-9.48-2.43-4.16-3.65-9.04-3.65-14.66s1.21-10.61,3.65-14.66c2.43-4.05,5.75-7.18,9.96-9.4,4.21-2.21,8.96-3.32,14.26-3.32s10.04,1.11,14.26,3.32c4.21,2.21,7.53,5.35,9.96,9.4,2.43,4.05,3.65,8.99,3.65,14.82s-1.21,10.69-3.65,14.5c-2.43,3.81-5.75,6.86-9.96,9.16-4.21,2.3-8.96,3.45-14.26,3.45Zm0,22.35c9.07,0,17.17-1.97,24.3-5.91,7.13-3.94,12.66-9.45,16.61-16.52,3.94-7.08,5.91-15.12,5.91-24.14s-1.97-16.95-5.91-23.98c-3.94-7.02-9.48-12.5-16.61-16.44-7.13-3.94-15.23-5.91-24.3-5.91s-17.17,1.97-24.3,5.91c-7.13,3.94-12.69,9.42-16.69,16.44-4,7.02-6,15.04-6,24.06s2,17.09,6,24.06c4,6.97,9.56,12.45,16.69,16.36,7.13,3.91,15.23,5.86,24.3,5.86Z"/>
+                        <path class="cls-2" d="M1190,40.09h-21.55v88.94h21.55V40.09Z"/>
+                    </g>
+                </svg>
+            </div>
+            
+            <div class="flex items-center space-x-6">
+                <button onclick="showSection('employees')" class="nav-link" id="nav-employees">Employees</button>
+                <button onclick="showSection('activity')" class="nav-link" id="nav-activity">Activity</button>
+                <button onclick="showSection('settings')" class="nav-link" id="nav-settings">Settings</button>
+                <button onclick="logout()" class="nav-link hover:bg-red-600">Logout</button>
             </div>
         </div>
-    </header>
+    </nav>
 
-    <div class="container mx-auto px-4 py-8">
-        <!-- Tab Navigation -->
-        <div class="mb-8">
-            <nav class="flex space-x-8">
-                <button 
-                    onclick="showTab('employees')" 
-                    id="employeesTab"
-                    class="tab-button active px-4 py-2 text-sm font-medium border-b-2 border-blue-500 text-blue-600"
-                >
-                    Employees
-                </button>
-                <button 
-                    onclick="showTab('activity')" 
-                    id="activityTab"
-                    class="tab-button px-4 py-2 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700"
-                >
-                    Activity Log
-                </button>
-            </nav>
+    <div class="max-w-7xl mx-auto px-6 py-8">
+        <!-- Dashboard Stats -->
+        <div id="dashboard-stats" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="stats-card p-6 rounded-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm" style="color: #ccc;">Total Employees</p>
+                        <p class="text-3xl font-bold" id="total-employees" style="color: var(--brand-white);">-</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background-color: var(--brand-red);">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stats-card p-6 rounded-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm" style="color: #ccc;">Today's Visits</p>
+                        <p class="text-3xl font-bold" id="today-visits" style="color: var(--brand-white);">-</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background-color: var(--brand-red);">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stats-card p-6 rounded-lg">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm" style="color: #ccc;">Notifications Sent</p>
+                        <p class="text-3xl font-bold" id="notifications-sent" style="color: var(--brand-white);">-</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-lg flex items-center justify-center" style="background-color: var(--brand-red);">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM15 17V7a7 7 0 10-14 0v10"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- Employees Tab -->
-        <div id="employeesContent" class="tab-content">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-semibold text-gray-800">Manage Employees</h2>
-                <button 
-                    onclick="showAddEmployeeModal()" 
-                    class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-                >
+        <!-- Employees Section -->
+        <div id="employees-section" class="section">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold" style="color: var(--brand-white);">Employee Management</h2>
+                <button onclick="showAddEmployeeModal()" class="btn-primary px-6 py-2 rounded-lg">
                     Add Employee
                 </button>
             </div>
-
-            <!-- Employee List -->
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                <div id="employeesList">
-                    <!-- Employee rows will be inserted here -->
-                </div>
-                <div id="employeesLoading" class="p-8 text-center text-gray-500">
-                    Loading employees...
-                </div>
-                <div id="employeesEmpty" class="p-8 text-center text-gray-500 hidden">
-                    No employees found. Add your first employee to get started.
+            
+            <div class="card p-6">
+                <div class="table-container">
+                    <div class="table-header px-6 py-3">
+                        <div class="grid grid-cols-12 gap-4 items-center font-semibold" style="color: var(--brand-white);">
+                            <div class="col-span-3">Name</div>
+                            <div class="col-span-3">Email</div>
+                            <div class="col-span-2">Department</div>
+                            <div class="col-span-2">Position</div>
+                            <div class="col-span-2">Actions</div>
+                        </div>
+                    </div>
+                    <div id="employees-table" class="divide-y divide-gray-600">
+                        <!-- Employee rows will be inserted here -->
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Activity Tab -->
-        <div id="activityContent" class="tab-content hidden">
-            <h2 class="text-xl font-semibold text-gray-800 mb-6">Recent Activity</h2>
-            
-            <div class="bg-white rounded-lg shadow overflow-hidden">
-                <div id="activityList">
-                    <!-- Activity rows will be inserted here -->
+        <!-- Activity Section -->
+        <div id="activity-section" class="section hidden">
+            <h2 class="text-2xl font-bold mb-6" style="color: var(--brand-white);">Recent Activity</h2>
+            <div class="card p-6">
+                <div class="table-container">
+                    <div class="table-header px-6 py-3">
+                        <div class="grid grid-cols-12 gap-4 items-center font-semibold" style="color: var(--brand-white);">
+                            <div class="col-span-3">Visitor</div>
+                            <div class="col-span-3">Employee</div>
+                            <div class="col-span-2">Time</div>
+                            <div class="col-span-2">Status</div>
+                            <div class="col-span-2">Message</div>
+                        </div>
+                    </div>
+                    <div id="activity-table" class="divide-y divide-gray-600">
+                        <!-- Activity rows will be inserted here -->
+                    </div>
                 </div>
-                <div id="activityLoading" class="p-8 text-center text-gray-500">
-                    Loading activity...
+            </div>
+        </div>
+
+        <!-- Settings Section -->
+        <div id="settings-section" class="section hidden">
+            <h2 class="text-2xl font-bold mb-6" style="color: var(--brand-white);">System Settings</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4" style="color: var(--brand-white);">Notification Settings</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-2" style="color: var(--brand-white);">Default Message</label>
+                            <textarea 
+                                class="form-input w-full px-4 py-2 rounded-lg" 
+                                rows="3"
+                                placeholder="You have a visitor waiting..."
+                            ></textarea>
+                        </div>
+                        <button class="btn-primary px-6 py-2 rounded-lg">Save Settings</button>
+                    </div>
                 </div>
-                <div id="activityEmpty" class="p-8 text-center text-gray-500 hidden">
-                    No activity recorded yet.
+                
+                <div class="card p-6">
+                    <h3 class="text-lg font-semibold mb-4" style="color: var(--brand-white);">System Information</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span style="color: #ccc;">Version:</span>
+                            <span style="color: var(--brand-white);">1.0.0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span style="color: #ccc;">Status:</span>
+                            <span class="text-green-400">Online</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span style="color: #ccc;">Last Update:</span>
+                            <span style="color: var(--brand-white);">Just now</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Add/Edit Employee Modal -->
-    <div id="employeeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-        <div class="bg-white p-8 rounded-lg max-w-md w-full mx-4 max-h-screen overflow-y-auto">
-            <h3 id="modalTitle" class="text-xl font-bold mb-4">Add Employee</h3>
-            <form id="employeeForm" enctype="multipart/form-data">
-                <input type="hidden" id="employeeId">
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Name *</label>
-                    <input 
-                        type="text" 
-                        id="employeeName"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                    >
-                </div>
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Position</label>
-                    <input 
-                        type="text" 
-                        id="employeePosition"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                </div>
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Department</label>
-                    <input 
-                        type="text" 
-                        id="employeeDepartment"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                </div>
-                
-                <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Photo</label>
-                    <input 
-                        type="file" 
-                        id="employeePhoto"
-                        accept="image/*"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                    <p class="text-xs text-gray-500 mt-1">Max 5MB, image files only</p>
-                    <div id="currentPhoto" class="mt-2 hidden">
-                        <p class="text-sm text-gray-600 mb-2">Current photo:</p>
-                        <img id="currentPhotoImg" class="w-20 h-20 rounded-full object-cover" />
+    <!-- Add Employee Modal -->
+    <div id="addEmployeeModal" class="modal-bg fixed inset-0 flex items-center justify-center hidden z-50">
+        <div class="modal-content p-8 rounded-lg max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold mb-4" style="color: var(--brand-white);">Add New Employee</h3>
+            <form id="addEmployeeForm">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--brand-white);">Name</label>
+                        <input type="text" name="name" required class="form-input w-full px-4 py-2 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--brand-white);">Email</label>
+                        <input type="email" name="email" required class="form-input w-full px-4 py-2 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--brand-white);">Department</label>
+                        <input type="text" name="department" class="form-input w-full px-4 py-2 rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--brand-white);">Position</label>
+                        <input type="text" name="position" class="form-input w-full px-4 py-2 rounded-lg">
                     </div>
                 </div>
-
-                <div class="flex space-x-4">
-                    <button 
-                        type="button" 
-                        onclick="closeEmployeeModal()"
-                        class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50"
-                    >
+                <div class="flex gap-4 mt-6">
+                    <button type="button" onclick="closeAddEmployeeModal()" class="btn-secondary flex-1 px-6 py-3 rounded-lg">
                         Cancel
                     </button>
-                    <button 
-                        type="submit"
-                        id="submitButton"
-                        class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                    >
-                        Save
+                    <button type="submit" class="btn-primary flex-1 px-6 py-3 rounded-lg">
+                        Add Employee
                     </button>
                 </div>
             </form>
@@ -158,262 +338,209 @@
     <script>
         let employees = [];
         let activities = [];
-        let editingEmployeeId = null;
 
-        // Load data when page loads
-        loadEmployees();
-
-        // Tab management
-        function showTab(tabName) {
-            // Update tab buttons
-            document.querySelectorAll('.tab-button').forEach(button => {
-                button.classList.remove('active', 'border-blue-500', 'text-blue-600');
-                button.classList.add('border-transparent', 'text-gray-500');
-            });
-            
-            document.getElementById(tabName + 'Tab').classList.add('active', 'border-blue-500', 'text-blue-600');
-            document.getElementById(tabName + 'Tab').classList.remove('border-transparent', 'text-gray-500');
-
-            // Update content
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.add('hidden');
-            });
-            
-            document.getElementById(tabName + 'Content').classList.remove('hidden');
-
-            // Load data for the active tab
-            if (tabName === 'activity') {
-                loadActivity();
-            }
+        // Authentication check
+        const token = localStorage.getItem('adminToken');
+        if (!token) {
+            window.location.href = '/admin';
         }
 
-        // Load employees
-        async function loadEmployees() {
+        // Navigation
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            // Remove active class from all nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(`${sectionName}-section`).classList.remove('hidden');
+            document.getElementById(`nav-${sectionName}`).classList.add('active');
+        }
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('adminToken');
+            window.location.href = '/admin';
+        }
+
+        // Fetch dashboard data
+        async function fetchDashboardData() {
             try {
-                const response = await fetch('/api/employees');
-                employees = await response.json();
+                const [employeesResponse, activityResponse] = await Promise.all([
+                    fetch('/api/employees'),
+                    fetch('/api/activity')
+                ]);
+                
+                const employeesData = await employeesResponse.json();
+                const activityData = await activityResponse.json();
+                
+                employees = employeesData.employees || [];
+                activities = activityData.activities || [];
+                
+                updateStats();
                 renderEmployees();
-                document.getElementById('employeesLoading').classList.add('hidden');
+                renderActivity();
             } catch (error) {
-                console.error('Error loading employees:', error);
-                document.getElementById('employeesLoading').innerHTML = '<p class="text-red-500">Error loading employees</p>';
+                console.error('Error fetching dashboard data:', error);
             }
         }
 
-        // Render employees
+        // Update stats cards
+        function updateStats() {
+            document.getElementById('total-employees').textContent = employees.length;
+            
+            const today = new Date().toDateString();
+            const todayVisits = activities.filter(activity => 
+                new Date(activity.timestamp).toDateString() === today
+            ).length;
+            document.getElementById('today-visits').textContent = todayVisits;
+            
+            document.getElementById('notifications-sent').textContent = activities.length;
+        }
+
+        // Render employees table
         function renderEmployees() {
-            const list = document.getElementById('employeesList');
-            const empty = document.getElementById('employeesEmpty');
+            const table = document.getElementById('employees-table');
             
             if (employees.length === 0) {
-                list.innerHTML = '';
-                empty.classList.remove('hidden');
+                table.innerHTML = `
+                    <div class="px-6 py-8 text-center" style="color: #ccc;">
+                        No employees found. Click "Add Employee" to get started.
+                    </div>
+                `;
                 return;
             }
-
-            empty.classList.add('hidden');
             
-            list.innerHTML = employees.map(employee => `
-                <div class="border-b border-gray-200 p-4 flex items-center justify-between">
-                    <div class="flex items-center space-x-4">
-                        <div class="flex-shrink-0">
-                            ${employee.photo 
-                                ? `<img src="${employee.photo}" alt="${employee.name}" class="w-12 h-12 rounded-full object-cover">`
-                                : `<div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center">
-                                     <span class="text-lg font-bold text-gray-600">${employee.name.charAt(0)}</span>
-                                   </div>`
-                            }
+            table.innerHTML = employees.map(employee => `
+                <div class="table-row px-6 py-4">
+                    <div class="grid grid-cols-12 gap-4 items-center">
+                        <div class="col-span-3" style="color: var(--brand-white);">${employee.name}</div>
+                        <div class="col-span-3" style="color: #ccc;">${employee.email}</div>
+                        <div class="col-span-2" style="color: #ccc;">${employee.department || 'N/A'}</div>
+                        <div class="col-span-2" style="color: #ccc;">${employee.position || 'N/A'}</div>
+                        <div class="col-span-2 flex gap-2">
+                            <button onclick="editEmployee(${employee.id})" class="btn-secondary px-3 py-1 text-sm rounded">
+                                Edit
+                            </button>
+                            <button onclick="deleteEmployee(${employee.id})" class="btn-danger px-3 py-1 text-sm rounded">
+                                Delete
+                            </button>
                         </div>
-                        <div>
-                            <h3 class="text-lg font-medium text-gray-900">${employee.name}</h3>
-                            <p class="text-sm text-gray-600">${employee.position || 'No position set'}</p>
-                            <p class="text-xs text-gray-500">${employee.department || 'No department set'}</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <button 
-                            onclick="editEmployee('${employee.id}')"
-                            class="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
-                        >
-                            Edit
-                        </button>
-                        <button 
-                            onclick="deleteEmployee('${employee.id}', '${employee.name}')"
-                            class="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
-                        >
-                            Delete
-                        </button>
                     </div>
                 </div>
             `).join('');
         }
 
-        // Load activity
-        async function loadActivity() {
-            try {
-                const response = await fetch('/api/activity');
-                activities = await response.json();
-                renderActivity();
-                document.getElementById('activityLoading').classList.add('hidden');
-            } catch (error) {
-                console.error('Error loading activity:', error);
-                document.getElementById('activityLoading').innerHTML = '<p class="text-red-500">Error loading activity</p>';
-            }
-        }
-
-        // Render activity
+        // Render activity table
         function renderActivity() {
-            const list = document.getElementById('activityList');
-            const empty = document.getElementById('activityEmpty');
+            const table = document.getElementById('activity-table');
             
             if (activities.length === 0) {
-                list.innerHTML = '';
-                empty.classList.remove('hidden');
+                table.innerHTML = `
+                    <div class="px-6 py-8 text-center" style="color: #ccc;">
+                        No activity recorded yet.
+                    </div>
+                `;
                 return;
             }
-
-            empty.classList.add('hidden');
             
-            list.innerHTML = activities.map(activity => `
-                <div class="border-b border-gray-200 p-4">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-sm font-medium text-gray-900">
-                                ${activity.guestName} visited ${activity.employeeName}
-                            </p>
-                            ${activity.message ? `<p class="text-sm text-gray-600 mt-1">"${activity.message}"</p>` : ''}
+            table.innerHTML = activities.map(activity => `
+                <div class="table-row px-6 py-4">
+                    <div class="grid grid-cols-12 gap-4 items-center">
+                        <div class="col-span-3" style="color: var(--brand-white);">${activity.visitor_name}</div>
+                        <div class="col-span-3" style="color: #ccc;">${activity.employee_name}</div>
+                        <div class="col-span-2" style="color: #ccc;">${new Date(activity.timestamp).toLocaleString()}</div>
+                        <div class="col-span-2">
+                            <span class="px-2 py-1 text-xs rounded-full bg-green-600 text-white">Notified</span>
                         </div>
-                        <span class="text-xs text-gray-500">
-                            ${new Date(activity.timestamp).toLocaleString()}
-                        </span>
+                        <div class="col-span-2" style="color: #ccc;">${activity.message || 'N/A'}</div>
                     </div>
                 </div>
             `).join('');
         }
 
-        // Employee modal management
+        // Modal functions
         function showAddEmployeeModal() {
-            editingEmployeeId = null;
-            document.getElementById('modalTitle').textContent = 'Add Employee';
-            document.getElementById('submitButton').textContent = 'Add Employee';
-            document.getElementById('employeeForm').reset();
-            document.getElementById('employeeId').value = '';
-            document.getElementById('currentPhoto').classList.add('hidden');
-            document.getElementById('employeeModal').classList.remove('hidden');
-            document.getElementById('employeeName').focus();
+            document.getElementById('addEmployeeModal').classList.remove('hidden');
         }
 
-        function editEmployee(employeeId) {
-            const employee = employees.find(emp => emp.id === employeeId);
-            if (!employee) return;
-
-            editingEmployeeId = employeeId;
-            document.getElementById('modalTitle').textContent = 'Edit Employee';
-            document.getElementById('submitButton').textContent = 'Update Employee';
-            document.getElementById('employeeId').value = employee.id;
-            document.getElementById('employeeName').value = employee.name;
-            document.getElementById('employeePosition').value = employee.position || '';
-            document.getElementById('employeeDepartment').value = employee.department || '';
-            
-            if (employee.photo) {
-                document.getElementById('currentPhoto').classList.remove('hidden');
-                document.getElementById('currentPhotoImg').src = employee.photo;
-            } else {
-                document.getElementById('currentPhoto').classList.add('hidden');
-            }
-
-            document.getElementById('employeeModal').classList.remove('hidden');
-            document.getElementById('employeeName').focus();
+        function closeAddEmployeeModal() {
+            document.getElementById('addEmployeeModal').classList.add('hidden');
+            document.getElementById('addEmployeeForm').reset();
         }
 
-        function closeEmployeeModal() {
-            document.getElementById('employeeModal').classList.add('hidden');
-            document.getElementById('employeeForm').reset();
-            editingEmployeeId = null;
-        }
-
-        // Handle employee form submission
-        document.getElementById('employeeForm').addEventListener('submit', async function(e) {
+        // Add employee form handler
+        document.getElementById('addEmployeeForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const submitButton = document.getElementById('submitButton');
-            const originalText = submitButton.textContent;
+            const formData = new FormData(e.target);
+            const employeeData = Object.fromEntries(formData.entries());
             
-            submitButton.disabled = true;
-            submitButton.textContent = 'Saving...';
-
-            const formData = new FormData();
-            formData.append('name', document.getElementById('employeeName').value);
-            formData.append('position', document.getElementById('employeePosition').value);
-            formData.append('department', document.getElementById('employeeDepartment').value);
-            
-            const photoFile = document.getElementById('employeePhoto').files[0];
-            if (photoFile) {
-                formData.append('photo', photoFile);
-            }
-
             try {
-                const url = editingEmployeeId ? `/api/employees/${editingEmployeeId}` : '/api/employees';
-                const method = editingEmployeeId ? 'PUT' : 'POST';
-                
-                const response = await fetch(url, {
-                    method: method,
-                    body: formData
+                const response = await fetch('/api/employees', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(employeeData)
                 });
-
+                
                 if (response.ok) {
-                    closeEmployeeModal();
-                    await loadEmployees(); // Reload employees list
+                    closeAddEmployeeModal();
+                    fetchDashboardData(); // Refresh data
                 } else {
                     const error = await response.json();
-                    alert('Error: ' + error.error);
+                    alert(error.error || 'Failed to add employee');
                 }
             } catch (error) {
-                console.error('Error saving employee:', error);
-                alert('Error saving employee. Please try again.');
-            } finally {
-                submitButton.disabled = false;
-                submitButton.textContent = originalText;
+                console.error('Error adding employee:', error);
+                alert('Failed to add employee');
             }
         });
 
-        // Delete employee
-        async function deleteEmployee(employeeId, employeeName) {
-            if (!confirm(`Are you sure you want to delete ${employeeName}?`)) {
+        // Employee actions
+        function editEmployee(id) {
+            // Implement edit functionality
+            alert('Edit functionality coming soon!');
+        }
+
+        async function deleteEmployee(id) {
+            if (!confirm('Are you sure you want to delete this employee?')) {
                 return;
             }
-
+            
             try {
-                const response = await fetch(`/api/employees/${employeeId}`, {
+                const response = await fetch(`/api/employees/${id}`, {
                     method: 'DELETE'
                 });
-
+                
                 if (response.ok) {
-                    await loadEmployees(); // Reload employees list
+                    fetchDashboardData(); // Refresh data
                 } else {
-                    const error = await response.json();
-                    alert('Error: ' + error.error);
+                    alert('Failed to delete employee');
                 }
             } catch (error) {
                 console.error('Error deleting employee:', error);
-                alert('Error deleting employee. Please try again.');
+                alert('Failed to delete employee');
             }
         }
 
-        // Logout
-        async function logout() {
-            try {
-                await fetch('/api/auth/logout', { method: 'POST' });
-                window.location.href = '/admin';
-            } catch (error) {
-                console.error('Logout error:', error);
-                window.location.href = '/admin';
-            }
-        }
+        // Initialize dashboard
+        fetchDashboardData();
+        
+        // Set default active section
+        showSection('employees');
 
-        // Close modal when clicking outside
-        document.getElementById('employeeModal').addEventListener('click', function(e) {
-            if (e.target === this) closeEmployeeModal();
+        // Close modals when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal-bg')) {
+                closeAddEmployeeModal();
+            }
         });
     </script>
 </body>
