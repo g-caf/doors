@@ -109,11 +109,43 @@ async function testAPI() {
       console.log(`   ${page.name}: ${pageResponse.status === 200 ? '✅' : '❌'} (${pageResponse.status})`);
     }
 
+    // Test notification endpoint
+    console.log('\n5️⃣ Testing notification endpoint...');
+    const notifyData = JSON.stringify({
+      employeeId: '1',
+      guestName: 'Test Visitor',
+      guestMessage: 'Test notification'
+    });
+    
+    const notifyResponse = await makeRequest({
+      hostname: 'localhost',
+      port: 3000,
+      path: '/api/notify',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(notifyData)
+      }
+    }, notifyData);
+    
+    console.log(`   Status: ${notifyResponse.status}`);
+    if (notifyResponse.status === 200) {
+      const result = JSON.parse(notifyResponse.body);
+      console.log('   ✅ Notification sent successfully');
+      console.log(`   📧 Slack status: ${result.slack?.success ? 'sent' : 'not configured/failed'}`);
+    } else {
+      console.log('   ❌ Notification failed');
+    }
+
     console.log('\n🎉 API testing completed!');
     console.log('\nTo manually test the application:');
     console.log('- Open http://localhost:3000 for the kiosk interface');
     console.log('- Open http://localhost:3000/admin for admin login');
     console.log('- Use credentials: admin / admin123');
+    console.log('\nFor Slack integration:');
+    console.log('- Set SLACK_BOT_TOKEN in your .env file');
+    console.log('- Use /api/slack/test to verify Slack connection');
+    console.log('- Add Slack user IDs to employee records for direct messaging');
 
   } catch (error) {
     console.error('❌ Test failed:', error.message);

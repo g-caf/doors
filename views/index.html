@@ -1,591 +1,508 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guest Check-in System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Georgia:wght@400;700&display=swap" rel="stylesheet">
+    <title>Sourcegraph Guest Check-in</title>
     <style>
-        /* Custom brand colors and design system */
-        :root {
-            --brand-red: #ff5543;
-            --brand-white: #fcfcfc;
-            --dark-bg: #0f0f0f;
-            --darker-bg: #000000;
-            --card-bg: rgba(255, 255, 255, 0.03);
-            --border-color: rgba(255, 255, 255, 0.1);
-            --red-transparent: rgba(255, 85, 67, 0.15);
-        }
-        
         * {
-            font-family: 'Georgia', serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        
+
         body {
-            background: linear-gradient(135deg, var(--darker-bg) 0%, var(--dark-bg) 100%);
-            color: var(--brand-white);
-            min-height: 100vh;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: #000;
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
             position: relative;
-            overflow-x: hidden;
         }
-        
-        /* Red geometric background elements */
-        .geometric-bg {
+
+        /* Red circular gradient background */
+        .bg-gradient {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120vmax;
+            height: 120vmax;
+            background: radial-gradient(circle, rgba(255, 85, 67, 0.8) 0%, rgba(255, 85, 67, 0.4) 40%, transparent 70%);
+            z-index: 1;
+        }
+
+        /* Main content container */
+        .container {
+            position: relative;
+            z-index: 2;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        /* Sourcegraph logo */
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6rem;
+            justify-content: center;
+        }
+
+        .logo-star {
+            font-size: 3.5rem;
+            color: #ff5543;
+            margin-right: 0.5rem;
+            font-weight: normal;
+        }
+
+        .logo-text {
+            font-size: 3.5rem;
+            font-weight: 400;
+            color: #fff;
+            letter-spacing: 0.5px;
+        }
+
+        /* Form section */
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            gap: 4rem;
+            align-items: center;
+            min-width: 600px;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .form-label {
+            font-size: 2.2rem;
+            font-weight: 400;
+            color: #fff;
+            min-width: 220px;
+            text-align: left;
+        }
+
+        /* Employee dropdown */
+        .employee-dropdown {
+            position: relative;
+            min-width: 350px;
+        }
+
+        .dropdown-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            text-align: left;
+            font-size: 1.1rem;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-button:hover {
+            border-color: #ff5543;
+            background: rgba(255, 85, 67, 0.1);
+        }
+
+        .employee-photo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .dropdown-content {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(40, 40, 40, 0.95);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+        }
+
+        .dropdown-item {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: background 0.2s ease;
+            font-size: 1.1rem;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(255, 85, 67, 0.2);
+        }
+
+        .dropdown-search {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            padding: 0.75rem;
+            width: 100%;
+            font-family: inherit;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .dropdown-search::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Name input */
+        .name-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-family: inherit;
+            min-width: 350px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .name-input:focus {
+            border-color: #ff5543;
+            background: rgba(255, 85, 67, 0.1);
+        }
+
+        .name-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Send button */
+        .send-button {
+            background: #ff5543;
+            color: #fff;
+            border: none;
+            padding: 1.2rem 4rem;
+            border-radius: 8px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+            align-self: center;
+            font-family: inherit;
+        }
+
+        .send-button:hover {
+            background: #e04435;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 85, 67, 0.4);
+        }
+
+        .send-button:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .form-section {
+                min-width: 90vw;
+                gap: 3rem;
+            }
+
+            .form-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .form-label {
+                font-size: 1.8rem;
+                min-width: auto;
+            }
+
+            .employee-dropdown,
+            .name-input {
+                min-width: 100%;
+                width: 100%;
+            }
+
+            .logo-text {
+                font-size: 2.8rem;
+            }
+
+            .logo-star {
+                font-size: 2.8rem;
+            }
+        }
+
+        /* Success modal */
+        .success-modal {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            pointer-events: none;
-            z-index: 0;
-        }
-        
-        .geometric-bg::before {
-            content: '';
-            position: absolute;
-            top: -20%;
-            right: -10%;
-            width: 40%;
-            height: 60%;
-            background: linear-gradient(45deg, var(--brand-red), rgba(255, 85, 67, 0.3));
-            border-radius: 50% 0% 50% 0%;
-            transform: rotate(15deg);
-            opacity: 0.1;
-        }
-        
-        .geometric-bg::after {
-            content: '';
-            position: absolute;
-            bottom: -15%;
-            left: -15%;
-            width: 35%;
-            height: 50%;
-            background: linear-gradient(-45deg, var(--brand-red), rgba(255, 85, 67, 0.2));
-            border-radius: 0% 50% 0% 50%;
-            transform: rotate(-20deg);
-            opacity: 0.08;
-        }
-        
-        .red-accent {
-            position: absolute;
-            top: 20%;
-            right: 20%;
-            width: 100px;
-            height: 100px;
-            background: radial-gradient(circle, var(--red-transparent), transparent);
-            border-radius: 50%;
-            opacity: 0.6;
-        }
-        
-        .content-wrapper {
-            position: relative;
-            z-index: 10;
-        }
-        
-        /* Dropdown styles */
-        .employee-dropdown {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            color: var(--brand-white);
-            position: relative;
-        }
-        
-        .employee-dropdown:focus {
-            border-color: var(--brand-red);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(255, 85, 67, 0.1);
-        }
-        
-        .dropdown-list {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            backdrop-filter: blur(10px);
-            border-radius: 16px;
-            max-height: 300px;
-            overflow-y: auto;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            z-index: 20;
-            margin-top: 8px;
-        }
-        
-        .dropdown-item {
-            padding: 16px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .dropdown-item:last-child {
-            border-bottom: none;
-        }
-        
-        .dropdown-item:hover {
-            background: var(--red-transparent);
-        }
-        
-        .employee-photo {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            border: 2px solid var(--border-color);
-            object-fit: cover;
-        }
-        
-        .employee-initial {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--brand-red), rgba(255, 85, 67, 0.7));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 20px;
-            color: white;
-        }
-        
-        .notify-btn {
-            background: linear-gradient(135deg, var(--brand-red), #e04435);
-            color: white;
-            font-weight: 600;
-            border: none;
-            border-radius: 12px;
-            padding: 16px 32px;
-            transition: all 0.3s ease;
-            font-size: 18px;
-        }
-        
-        .notify-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 24px rgba(255, 85, 67, 0.4);
-        }
-        
-        .notify-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        /* Modal styles */
-        .modal-bg {
             background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
         }
-        
-        .modal-content {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
+
+        .success-content {
+            background: rgba(40, 40, 40, 0.95);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
             backdrop-filter: blur(10px);
-            border-radius: 20px;
         }
-        
-        .form-input {
-            background: var(--darker-bg);
-            border: 1px solid var(--border-color);
-            color: var(--brand-white);
-            border-radius: 12px;
-            padding: 12px 16px;
-            transition: all 0.2s ease;
-        }
-        
-        .form-input:focus {
-            border-color: var(--brand-red);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(255, 85, 67, 0.1);
-        }
-        
-        .form-input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-        
-        .btn-secondary {
-            background: var(--border-color);
-            color: var(--brand-white);
-            border: none;
-            border-radius: 12px;
-            padding: 12px 24px;
-            transition: all 0.2s ease;
-        }
-        
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
+
         .success-icon {
-            width: 64px;
-            height: 64px;
-            background: linear-gradient(135deg, #10b981, #059669);
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 2rem;
+            background: #10b981;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto;
         }
-        
-        /* Scrollbar styling */
-        .dropdown-list::-webkit-scrollbar {
-            width: 6px;
+
+        .success-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #fff;
         }
-        
-        .dropdown-list::-webkit-scrollbar-track {
-            background: transparent;
+
+        .success-message {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 2rem;
         }
-        
-        .dropdown-list::-webkit-scrollbar-thumb {
-            background: var(--border-color);
-            border-radius: 3px;
+
+        .ok-button {
+            background: #ff5543;
+            color: #fff;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
         }
-        
-        .dropdown-list::-webkit-scrollbar-thumb:hover {
-            background: var(--brand-red);
+
+        .ok-button:hover {
+            background: #e04435;
+        }
+
+        .hidden {
+            display: none;
         }
     </style>
 </head>
-<body>
-    <!-- Geometric background -->
-    <div class="geometric-bg">
-        <div class="red-accent"></div>
-    </div>
 
-    <div class="content-wrapper min-h-screen flex flex-col items-center justify-center px-6 py-8">
-        <!-- Header with Sourcegraph Logo Text -->
-        <div class="text-center mb-12">
-            <h1 class="text-6xl font-bold mb-6 text-white" style="font-family: Georgia, serif;">
-                Sourcegraph
-            </h1>
-            <h2 class="text-3xl font-normal mb-4 text-white opacity-90">
-                Welcome
-            </h2>
-            <p class="text-xl text-white opacity-70">
-                Please select the person you're here to see
-            </p>
+<body>
+    <!-- Red circular gradient background -->
+    <div class="bg-gradient"></div>
+
+    <!-- Main content -->
+    <div class="container">
+        <!-- Sourcegraph logo -->
+        <div class="logo">
+            <span class="logo-star">✱</span>
+            <div class="logo-text">Sourcegraph</div>
         </div>
 
-        <!-- Employee Selection Dropdown -->
-        <div class="w-full max-w-md mb-8 relative">
-            <div class="employee-dropdown">
-                <div id="dropdownToggle" class="px-6 py-4 cursor-pointer flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                        <div id="selectedEmployeePhoto" class="hidden">
-                            <!-- Employee photo or initial will be inserted here -->
+        <!-- Form section -->
+        <div class="form-section">
+            <!-- Meeting with dropdown -->
+            <div class="form-row">
+                <label class="form-label">Meeting with:</label>
+                <div class="employee-dropdown">
+                    <button class="dropdown-button" id="employeeButton">
+                        <span id="selectedEmployeeName">Select an employee...</span>
+                    </button>
+                    <div class="dropdown-content hidden" id="employeeDropdown">
+                        <input type="text" class="dropdown-search" id="searchInput" placeholder="Search employees...">
+                        <div id="employeeList">
+                            <!-- Employee options will be inserted here -->
                         </div>
-                        <span id="dropdownLabel" class="text-lg">Select an employee...</span>
                     </div>
-                    <svg class="w-5 h-5 transition-transform duration-200" id="dropdownArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
-                </div>
-                <div id="dropdownList" class="dropdown-list hidden">
-                    <!-- Employee options will be populated here -->
                 </div>
             </div>
-        </div>
 
-        <!-- Notify Button -->
-        <button id="notifyButton" class="notify-btn disabled:opacity-50" disabled>
-            Notify Employee
-        </button>
+            <!-- Your name input -->
+            <div class="form-row">
+                <label class="form-label">Your name:</label>
+                <input type="text" class="name-input" id="visitorName" placeholder="Enter your name">
+            </div>
 
-        <!-- Loading State -->
-        <div id="loading" class="text-center py-8">
-            <p class="text-white opacity-60 text-lg">Loading employees...</p>
-        </div>
-
-        <!-- Empty State -->
-        <div id="emptyState" class="text-center py-8 hidden">
-            <p class="text-white opacity-60 text-lg">No employees found</p>
+            <!-- Send button (hidden until both fields filled) -->
+            <button class="send-button hidden" id="sendButton">Send</button>
         </div>
     </div>
 
-    <!-- Notification Modal -->
-    <div id="notificationModal" class="modal-bg fixed inset-0 flex items-center justify-center hidden z-50">
-        <div class="modal-content p-8 rounded-xl max-w-md w-full mx-4">
-            <h3 class="text-2xl font-bold mb-6 text-white text-center">Notify Employee</h3>
-            <form id="notificationForm">
-                <input type="hidden" id="selectedEmployeeId">
-                <div class="mb-6">
-                    <label class="block text-sm font-medium mb-3 text-white opacity-90">Your Name</label>
-                    <input 
-                        type="text" 
-                        id="visitorName" 
-                        required 
-                        class="form-input w-full"
-                        placeholder="Enter your name"
-                    >
-                </div>
-                <div class="mb-8">
-                    <label class="block text-sm font-medium mb-3 text-white opacity-90">Message (optional)</label>
-                    <textarea 
-                        id="visitorMessage" 
-                        rows="4" 
-                        class="form-input w-full resize-none"
-                        placeholder="Additional message..."
-                    ></textarea>
-                </div>
-                <div class="flex space-x-4">
-                    <button 
-                        type="button" 
-                        onclick="closeModal()" 
-                        class="btn-secondary flex-1 font-medium"
-                    >
-                        Cancel
-                    </button>
-                    <button 
-                        type="submit" 
-                        class="notify-btn flex-1"
-                    >
-                        Send Notification
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Success Modal -->
-    <div id="successModal" class="modal-bg fixed inset-0 flex items-center justify-center hidden z-50">
-        <div class="modal-content p-8 rounded-xl max-w-md w-full mx-4 text-center">
-            <div class="success-icon mb-6">
-                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+    <!-- Success modal -->
+    <div class="success-modal hidden" id="successModal">
+        <div class="success-content">
+            <div class="success-icon">
+                <svg width="40" height="40" fill="#fff" viewBox="0 0 24 24">
+                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
                 </svg>
             </div>
-            <h3 class="text-2xl font-bold mb-4 text-white">Notification Sent!</h3>
-            <p class="mb-8 text-white opacity-70 text-lg">The employee has been notified of your arrival.</p>
-            <button 
-                onclick="closeSuccessModal()" 
-                class="notify-btn"
-            >
-                OK
-            </button>
+            <h2 class="success-title">Notification Sent!</h2>
+            <p class="success-message">The employee has been notified of your arrival.</p>
+            <button class="ok-button" onclick="resetForm()">OK</button>
         </div>
     </div>
 
     <script>
         let employees = [];
         let selectedEmployee = null;
-        let isRateLimited = false;
-        let dropdownOpen = false;
 
-        // Fetch employees from API
+        // Fetch employees
         async function fetchEmployees() {
             try {
                 const response = await fetch('/api/employees');
                 const data = await response.json();
                 employees = data.employees || [];
-                populateDropdown();
-                document.getElementById('loading').style.display = 'none';
+                renderEmployeeList();
             } catch (error) {
                 console.error('Error fetching employees:', error);
-                document.getElementById('loading').innerHTML = '<p class="text-red-400 text-lg">Error loading employees</p>';
             }
         }
 
-        // Populate dropdown with employees
-        function populateDropdown() {
-            const dropdownList = document.getElementById('dropdownList');
-            const emptyState = document.getElementById('emptyState');
-            
-            if (employees.length === 0) {
-                emptyState.classList.remove('hidden');
-                return;
-            }
-            
-            emptyState.classList.add('hidden');
-            
-            dropdownList.innerHTML = employees.map(employee => `
-                <div class="dropdown-item flex items-center space-x-4" onclick="selectEmployee(${employee.id}, '${employee.name}', '${employee.photo_url || ''}', '${employee.department || ''}')">
-                    <div class="flex-shrink-0">
-                        ${employee.photo_url ? 
-                            `<img src="${employee.photo_url}" alt="${employee.name}" class="employee-photo">` : 
-                            `<div class="employee-initial">${employee.name.charAt(0)}</div>`
-                        }
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <h4 class="font-semibold text-lg text-white">${employee.name}</h4>
-                        ${employee.department ? `<p class="text-sm text-white opacity-70">${employee.department}</p>` : ''}
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Filter dropdown based on search
-        function filterDropdown(searchTerm) {
-            const dropdownList = document.getElementById('dropdownList');
-            const filtered = employees.filter(employee => 
-                employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                (employee.department && employee.department.toLowerCase().includes(searchTerm.toLowerCase()))
+        // Render employee dropdown list
+        function renderEmployeeList(searchTerm = '') {
+            const list = document.getElementById('employeeList');
+            const filtered = employees.filter(emp =>
+                emp.name.toLowerCase().includes(searchTerm.toLowerCase())
             );
-            
-            if (filtered.length === 0) {
-                dropdownList.innerHTML = '<div class="dropdown-item text-center text-white opacity-60">No employees found</div>';
-                return;
-            }
-            
-            dropdownList.innerHTML = filtered.map(employee => `
-                <div class="dropdown-item flex items-center space-x-4" onclick="selectEmployee(${employee.id}, '${employee.name}', '${employee.photo_url || ''}', '${employee.department || ''}')">
-                    <div class="flex-shrink-0">
-                        ${employee.photo_url ? 
-                            `<img src="${employee.photo_url}" alt="${employee.name}" class="employee-photo">` : 
-                            `<div class="employee-initial">${employee.name.charAt(0)}</div>`
-                        }
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <h4 class="font-semibold text-lg text-white">${employee.name}</h4>
-                        ${employee.department ? `<p class="text-sm text-white opacity-70">${employee.department}</p>` : ''}
-                    </div>
+
+            list.innerHTML = filtered.map(employee => `
+                <div class="dropdown-item" onclick="selectEmployee(${employee.id}, '${employee.name}', '${employee.photo_url || ''}')">
+                    <img src="${employee.photo_url || ''}" alt="${employee.name}" class="employee-photo" 
+                         onerror="this.style.display='none'">
+                    <span>${employee.name}</span>
                 </div>
             `).join('');
-        }
-
-        // Toggle dropdown
-        function toggleDropdown() {
-            const dropdownList = document.getElementById('dropdownList');
-            const dropdownArrow = document.getElementById('dropdownArrow');
-            
-            dropdownOpen = !dropdownOpen;
-            
-            if (dropdownOpen) {
-                dropdownList.classList.remove('hidden');
-                dropdownArrow.style.transform = 'rotate(180deg)';
-            } else {
-                dropdownList.classList.add('hidden');
-                dropdownArrow.style.transform = 'rotate(0deg)';
-            }
         }
 
         // Select employee
-        function selectEmployee(employeeId, employeeName, photoUrl, department) {
-            selectedEmployee = { id: employeeId, name: employeeName, photo_url: photoUrl, department: department };
-            
-            const dropdownLabel = document.getElementById('dropdownLabel');
-            const selectedEmployeePhoto = document.getElementById('selectedEmployeePhoto');
-            const notifyButton = document.getElementById('notifyButton');
-            
-            // Update label
-            dropdownLabel.textContent = employeeName;
-            
-            // Update photo
-            selectedEmployeePhoto.innerHTML = photoUrl ? 
-                `<img src="${photoUrl}" alt="${employeeName}" class="employee-photo">` : 
-                `<div class="employee-initial">${employeeName.charAt(0)}</div>`;
-            selectedEmployeePhoto.classList.remove('hidden');
-            
-            // Enable notify button
-            notifyButton.disabled = false;
-            notifyButton.classList.remove('disabled:opacity-50');
-            
-            // Close dropdown
-            toggleDropdown();
-        }
+        function selectEmployee(id, name, photoUrl) {
+            selectedEmployee = { id, name, photoUrl };
+            const button = document.getElementById('employeeButton');
+            const nameElement = document.getElementById('selectedEmployeeName');
 
-        // Open notification modal
-        function openNotificationModal() {
-            if (!selectedEmployee) return;
-            
-            document.getElementById('selectedEmployeeId').value = selectedEmployee.id;
-            document.getElementById('notificationModal').classList.remove('hidden');
-            document.getElementById('visitorName').focus();
-        }
-
-        // Close modal
-        function closeModal() {
-            document.getElementById('notificationModal').classList.add('hidden');
-            document.getElementById('notificationForm').reset();
-        }
-
-        // Close success modal
-        function closeSuccessModal() {
-            document.getElementById('successModal').classList.add('hidden');
-            // Reset the form
-            selectedEmployee = null;
-            document.getElementById('dropdownLabel').textContent = 'Select an employee...';
-            document.getElementById('selectedEmployeePhoto').classList.add('hidden');
-            document.getElementById('notifyButton').disabled = true;
-            document.getElementById('notifyButton').classList.add('disabled:opacity-50');
-        }
-
-        // Handle form submission
-        document.getElementById('notificationForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            if (isRateLimited) {
-                alert('Please wait before sending another notification.');
-                return;
+            // Update button content with photo and name
+            if (photoUrl) {
+                button.innerHTML = `
+                    <img src="${photoUrl}" alt="${name}" class="employee-photo">
+                    <span id="selectedEmployeeName">${name}</span>
+                `;
+            } else {
+                button.innerHTML = `<span id="selectedEmployeeName">${name}</span>`;
             }
-            
-            const employeeId = document.getElementById('selectedEmployeeId').value;
-            const visitorName = document.getElementById('visitorName').value;
-            const message = document.getElementById('visitorMessage').value;
-            
+
+            document.getElementById('employeeDropdown').classList.add('hidden');
+            checkFormComplete();
+        }
+
+        // Check if form is complete and show send button
+        function checkFormComplete() {
+            const visitorName = document.getElementById('visitorName').value.trim();
+            const sendButton = document.getElementById('sendButton');
+
+            if (selectedEmployee && visitorName) {
+                sendButton.classList.remove('hidden');
+            } else {
+                sendButton.classList.add('hidden');
+            }
+        }
+
+        // Send notification
+        async function sendNotification() {
+            if (!selectedEmployee) return;
+
+            const visitorName = document.getElementById('visitorName').value.trim();
+
             try {
-                isRateLimited = true;
-                setTimeout(() => { isRateLimited = false; }, 30000); // 30 second rate limit
-                
                 const response = await fetch('/api/notify', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        employeeId: parseInt(employeeId),
-                        visitorName,
-                        message
+                        employeeId: selectedEmployee.id,
+                        visitorName: visitorName
                     })
                 });
-                
-                const result = await response.json();
-                
+
                 if (response.ok) {
-                    closeModal();
                     document.getElementById('successModal').classList.remove('hidden');
                 } else {
-                    alert(result.error || 'Failed to send notification');
-                    isRateLimited = false;
+                    alert('Failed to send notification. Please try again.');
                 }
             } catch (error) {
                 console.error('Error sending notification:', error);
                 alert('Failed to send notification. Please try again.');
-                isRateLimited = false;
             }
-        });
+        }
+
+        // Reset form
+        function resetForm() {
+            selectedEmployee = null;
+            document.getElementById('employeeButton').innerHTML = '<span id="selectedEmployeeName">Select an employee...</span>';
+            document.getElementById('visitorName').value = '';
+            document.getElementById('sendButton').classList.add('hidden');
+            document.getElementById('successModal').classList.add('hidden');
+            document.getElementById('searchInput').value = '';
+            renderEmployeeList();
+        }
 
         // Event listeners
-        document.getElementById('dropdownToggle').addEventListener('click', toggleDropdown);
-        document.getElementById('notifyButton').addEventListener('click', openNotificationModal);
+        document.getElementById('employeeButton').addEventListener('click', function () {
+            const dropdown = document.getElementById('employeeDropdown');
+            dropdown.classList.toggle('hidden');
+            if (!dropdown.classList.contains('hidden')) {
+                document.getElementById('searchInput').focus();
+            }
+        });
+
+        document.getElementById('searchInput').addEventListener('input', function (e) {
+            renderEmployeeList(e.target.value);
+        });
+
+        document.getElementById('visitorName').addEventListener('input', checkFormComplete);
+
+        document.getElementById('sendButton').addEventListener('click', sendNotification);
 
         // Close dropdown when clicking outside
-        document.addEventListener('click', function(e) {
-            const dropdown = document.querySelector('.employee-dropdown');
-            if (!dropdown.contains(e.target) && dropdownOpen) {
-                toggleDropdown();
-            }
-        });
+        document.addEventListener('click', function (e) {
+            const dropdown = document.getElementById('employeeDropdown');
+            const button = document.getElementById('employeeButton');
 
-        // Close modals when clicking outside
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('modal-bg')) {
-                closeModal();
-                closeSuccessModal();
-            }
-        });
-
-        // Keyboard support for dropdown
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                if (dropdownOpen) {
-                    toggleDropdown();
-                } else {
-                    closeModal();
-                    closeSuccessModal();
-                }
+            if (!dropdown.contains(e.target) && !button.contains(e.target)) {
+                dropdown.classList.add('hidden');
             }
         });
 
@@ -593,4 +510,5 @@
         fetchEmployees();
     </script>
 </body>
+
 </html>

@@ -7,9 +7,13 @@ const fs = require('fs');
 const multer = require('multer');
 const session = require('express-session');
 const rateLimit = require('express-rate-limit');
+const { WebClient } = require('@slack/web-api');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Initialize Slack client
+const slack = process.env.SLACK_BOT_TOKEN ? new WebClient(process.env.SLACK_BOT_TOKEN) : null;
 
 // Data storage
 let employees = [
@@ -20,6 +24,7 @@ let employees = [
     department: "Engineering",
     position: "Software Engineer",
     photo_url: "/public/Adrienne%20Caffarel.png",
+    slackUserId: null,
     createdAt: new Date().toISOString()
   },
   {
@@ -29,6 +34,7 @@ let employees = [
     department: "Engineering",
     position: "CTO",
     photo_url: "/public/Beyang%20Liu.png",
+    slackUserId: null,
     createdAt: new Date().toISOString()
   },
   {
@@ -38,6 +44,7 @@ let employees = [
     department: "Engineering",
     position: "VP of Engineering",
     photo_url: "/public/Dan%20Adler.png",
+    slackUserId: null,
     createdAt: new Date().toISOString()
   },
   {
@@ -47,6 +54,7 @@ let employees = [
     department: "Engineering",
     position: "Software Engineer",
     photo_url: "/public/Madison%20Clark.png",
+    slackUserId: null,
     createdAt: new Date().toISOString()
   },
   {
@@ -55,7 +63,8 @@ let employees = [
     email: "quinn@sourcegraph.com",
     department: "Executive",
     position: "CEO",
-    photo_url: "/public/Quinn%20Slack.png", 
+    photo_url: "/public/Quinn%20Slack.png",
+    slackUserId: null, 
     createdAt: new Date().toISOString()
   }
 ];
@@ -82,6 +91,63 @@ if (!fs.existsSync('./data')) {
 function saveData() {
   fs.writeFileSync('./data/employees.json', JSON.stringify(employees, null, 2));
   fs.writeFileSync('./data/activity.json', JSON.stringify(activityLogs, null, 2));
+}
+
+// Slack notification functions
+async function sendSlackDirectMessage(userId, message) {
+  if (!slack) {
+    console.log('Slack not configured - would send DM:', message);
+    return { success: false, error: 'Slack not configured' };
+  }
+
+  try {
+    const result = await slack.chat.postMessage({
+      channel: userId,
+      text: message,
+      as_user: true
+    });
+
+    console.log('Slack DM sent successfully:', result.ts);
+    return { success: true, messageTs: result.ts };
+  } catch (error) {
+    console.error('Error sending Slack DM:', error.message);
+    return { success: false, error: error.message };
+  }
+}
+
+async function sendSlackChannelMessage(channelId, message) {
+  if (!slack) {
+    console.log('Slack not configured - would send channel message:', message);
+    return { success: false, error: 'Slack not configured' };
+  }
+
+  try {
+    const result = await slack.chat.postMessage({
+      channel: channelId,
+      text: message,
+      as_user: true
+    });
+
+    console.log('Slack channel message sent successfully:', result.ts);
+    return { success: true, messageTs: result.ts };
+  } catch (error) {
+    console.error('Error sending Slack channel message:', error.message);
+    return { success: false, error: error.message };
+  }
+}
+
+async function findSlackUserByEmail(email) {
+  if (!slack) {
+    return null;
+  }
+
+  try {
+    const result = await slack.users.lookupByEmail({ email });
+    return result.user.id;
+  } catch (error) {
+    console.error('Error finding Slack user by email:', error.message);
+    return null;
+  }
 }
 
 // Middleware
@@ -201,7 +267,7 @@ app.get('/api/employees', (req, res) => {
 
 // Create employee (admin only)
 app.post('/api/employees', requireAuth, upload.single('photo'), (req, res) => {
-  const { name, department, position } = req.body;
+  const { name, email, department, position, slackUserId } = req.body;
   
   if (!name) {
     return res.status(400).json({ error: 'Name is required' });
@@ -210,9 +276,11 @@ app.post('/api/employees', requireAuth, upload.single('photo'), (req, res) => {
   const employee = {
     id: Date.now().toString(),
     name,
+    email: email || '',
     department: department || '',
     position: position || '',
     photo: req.file ? `/public/uploads/${req.file.filename}` : null,
+    slackUserId: slackUserId || null,
     createdAt: new Date().toISOString()
   };
 
@@ -225,7 +293,7 @@ app.post('/api/employees', requireAuth, upload.single('photo'), (req, res) => {
 // Update employee (admin only)
 app.put('/api/employees/:id', requireAuth, upload.single('photo'), (req, res) => {
   const { id } = req.params;
-  const { name, department, position } = req.body;
+  const { name, email, department, position, slackUserId } = req.body;
   
   const employeeIndex = employees.findIndex(emp => emp.id === id);
   if (employeeIndex === -1) {
@@ -234,8 +302,10 @@ app.put('/api/employees/:id', requireAuth, upload.single('photo'), (req, res) =>
 
   const employee = employees[employeeIndex];
   employee.name = name || employee.name;
+  employee.email = email || employee.email;
   employee.department = department || employee.department;
   employee.position = position || employee.position;
+  employee.slackUserId = slackUserId !== undefined ? slackUserId : employee.slackUserId;
   
   if (req.file) {
     // Delete old photo if it exists
@@ -280,8 +350,8 @@ app.delete('/api/employees/:id', requireAuth, (req, res) => {
 });
 
 // Notify employee
-app.post('/api/notify', (req, res) => {
-  const { employeeId, guestName, guestMessage } = req.body;
+app.post('/api/notify', async (req, res) => {
+  const { employeeId, guestName, guestMessage, channelId } = req.body;
   
   const employee = employees.find(emp => emp.id === employeeId);
   if (!employee) {
@@ -301,20 +371,99 @@ app.post('/api/notify', (req, res) => {
   activityLogs.push(activity);
   saveData();
 
-  // In a real app, send email/SMS here
+  // Create Slack message
+  const slackMessage = `👋 Hi ${employee.name}! ${activity.guestName} is here to see you at the front desk.`;
+  
+  let slackResult = { success: false, error: 'No Slack configuration' };
+  
+  // Try to send Slack notification
+  if (slack) {
+    try {
+      // If employee doesn't have slackUserId but has email, try to find Slack user
+      if (!employee.slackUserId && employee.email) {
+        const slackUserId = await findSlackUserByEmail(employee.email);
+        if (slackUserId) {
+          employee.slackUserId = slackUserId;
+          saveData(); // Save the updated slackUserId for future use
+        }
+      }
+
+      // Send to employee via DM if we have their Slack user ID
+      if (employee.slackUserId) {
+        slackResult = await sendSlackDirectMessage(employee.slackUserId, slackMessage);
+      }
+      // Otherwise, send to channel if specified
+      else if (channelId) {
+        const channelMessage = `👋 ${activity.guestName} is here to see ${employee.name} at the front desk.`;
+        slackResult = await sendSlackChannelMessage(channelId, channelMessage);
+      }
+    } catch (error) {
+      console.error('Error sending Slack notification:', error.message);
+      slackResult = { success: false, error: error.message };
+    }
+  }
+
+  // Console logging for debugging
   console.log(`NOTIFICATION: ${activity.guestName} is here to see ${employee.name}`);
   console.log(`Message: ${activity.message}`);
+  console.log(`Slack notification: ${slackResult.success ? 'sent' : 'failed'}`);
 
   res.json({ 
     success: true, 
     message: `Notification sent to ${employee.name}`,
-    activity 
+    activity,
+    slack: slackResult
   });
 });
 
 // Get activity logs (admin only)
 app.get('/api/activity', requireAuth, (req, res) => {
   res.json(activityLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)));
+});
+
+// Lookup Slack user by email (admin only)
+app.post('/api/slack/lookup-user', requireAuth, async (req, res) => {
+  const { email } = req.body;
+  
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required' });
+  }
+
+  if (!slack) {
+    return res.status(503).json({ error: 'Slack not configured' });
+  }
+
+  try {
+    const slackUserId = await findSlackUserByEmail(email);
+    if (slackUserId) {
+      res.json({ success: true, slackUserId });
+    } else {
+      res.status(404).json({ error: 'Slack user not found' });
+    }
+  } catch (error) {
+    console.error('Error looking up Slack user:', error.message);
+    res.status(500).json({ error: 'Failed to lookup Slack user' });
+  }
+});
+
+// Test Slack connection (admin only)
+app.get('/api/slack/test', requireAuth, async (req, res) => {
+  if (!slack) {
+    return res.status(503).json({ error: 'Slack not configured' });
+  }
+
+  try {
+    const result = await slack.auth.test();
+    res.json({
+      success: true,
+      team: result.team,
+      user: result.user,
+      bot_id: result.bot_id
+    });
+  } catch (error) {
+    console.error('Slack auth test failed:', error.message);
+    res.status(500).json({ error: 'Slack connection failed', details: error.message });
+  }
 });
 
 // Health check
