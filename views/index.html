@@ -200,6 +200,13 @@
             box-shadow: 0 8px 20px rgba(255, 85, 67, 0.4);
         }
         
+        .send-button.sent {
+            background: #fff;
+            color: #ff5543;
+            transform: none;
+            box-shadow: none;
+        }
+        
         /* Success modal */
         .success-modal {
             position: fixed;
@@ -405,8 +412,13 @@
                 });
                 
                 if (response.ok) {
-                    document.getElementById('successModal').classList.remove('hidden');
-                    // Auto-close and reset after 2 seconds
+                    // Change button to "Sent!" with white background
+                    const sendButton = document.getElementById('sendButton');
+                    sendButton.textContent = 'Sent!';
+                    sendButton.classList.add('sent');
+                    sendButton.disabled = true;
+                    
+                    // Reset after 2 seconds
                     setTimeout(() => {
                         resetForm();
                     }, 2000);
@@ -424,7 +436,12 @@
             selectedEmployee = null;
             document.getElementById('selectedEmployeeName').textContent = 'Select an employee...';
             document.getElementById('visitorName').value = '';
-            document.getElementById('sendButton').classList.remove('show');
+            
+            const sendButton = document.getElementById('sendButton');
+            sendButton.textContent = 'Send';
+            sendButton.classList.remove('show', 'sent');
+            sendButton.disabled = false;
+            
             document.getElementById('successModal').classList.add('hidden');
             document.getElementById('searchInput').value = '';
             renderEmployeeList();
