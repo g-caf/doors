@@ -13,7 +13,7 @@
         
         body {
             font-family: 'Georgia', 'Times New Roman', serif;
-            background: #000 url('/BLANKSLATE.pdf.png') center center / cover no-repeat;
+            background: #000 url('/public/BLANKSLATE.pdf.png') center center / cover no-repeat;
             color: #fff;
             height: 100vh;
             overflow: hidden;
@@ -370,12 +370,22 @@
             console.log('Rendering employees:', filtered);
             
             list.innerHTML = filtered.map(employee => `
-                <div class="dropdown-item" onclick="selectEmployee(${employee.id}, '${employee.name}', '${employee.photo_url || ''}')">
+                <div class="dropdown-item" data-id="${employee.id}" data-name="${employee.name}" data-photo="${employee.photo_url || ''}">
                     <img src="${employee.photo_url || ''}" alt="${employee.name}" class="employee-photo" 
                          onerror="this.style.display='none'">
                     <span>${employee.name}</span>
                 </div>
             `).join('');
+            
+            // Add click listeners to dropdown items
+            document.querySelectorAll('.dropdown-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const id = this.dataset.id;
+                    const name = this.dataset.name;
+                    const photo = this.dataset.photo;
+                    selectEmployee(id, name, photo);
+                });
+            });
         }
         
         // Select employee
