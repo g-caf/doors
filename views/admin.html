@@ -498,18 +498,25 @@
         // Load employees and activities
         async function loadData() {
             try {
+                console.log('Loading data...');
+                
                 // Load employees
                 const employeeResponse = await fetch('/api/employees');
                 const employeeData = await employeeResponse.json();
                 employees = employeeData.employees || [];
+                console.log('Loaded', employees.length, 'employees');
                 
                 // Load activities (with cache busting)
-                const activityResponse = await fetch('/api/activity?ts=' + Date.now(), { cache: 'no-store' });
+                const activityUrl = '/api/activity?ts=' + Date.now();
+                console.log('Fetching activities from:', activityUrl);
+                const activityResponse = await fetch(activityUrl, { cache: 'no-store' });
                 activities = await activityResponse.json();
+                console.log('Loaded', activities.length, 'activities:', activities);
                 
                 renderEmployees();
                 updateStats();
                 renderActivity();
+                console.log('Data loading complete');
             } catch (error) {
                 console.error('Error loading data:', error);
             }
@@ -637,8 +644,11 @@
         // Initialize
         loadData();
         
-        // Refresh data every 30 seconds
-        setInterval(loadData, 30000);
+        // Refresh data every 30 seconds (with console logging)
+        setInterval(() => {
+            console.log('Auto-refreshing data at', new Date().toLocaleString());
+            loadData();
+        }, 30000);
     </script>
 </body>
 </html>
