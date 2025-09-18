@@ -10,4 +10,8 @@ services:
         value: production
       - key: SESSION_SECRET
         generateValue: true
+      - key: SLACK_BOT_TOKEN
+        value: xoxb-your-token-here
+      - key: SLACK_DEFAULT_CHANNEL
+        value: C07V5SGFTLD
     healthCheckPath: /health

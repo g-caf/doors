@@ -101,16 +101,17 @@ async function sendSlackDirectMessage(userId, message) {
   }
 
   try {
+    // First open a DM channel (required for bot tokens)
+    const dmResult = await slack.conversations.open({ users: userId });
     const result = await slack.chat.postMessage({
-      channel: userId,
-      text: message,
-      as_user: true
+      channel: dmResult.channel.id,
+      text: message
     });
 
     console.log('Slack DM sent successfully:', result.ts);
     return { success: true, messageTs: result.ts };
   } catch (error) {
-    console.error('Error sending Slack DM:', error.message);
+    console.error('Error sending Slack DM:', error);
     return { success: false, error: error.message };
   }
 }
@@ -124,14 +125,13 @@ async function sendSlackChannelMessage(channelId, message) {
   try {
     const result = await slack.chat.postMessage({
       channel: channelId,
-      text: message,
-      as_user: true
+      text: message
     });
 
     console.log('Slack channel message sent successfully:', result.ts);
     return { success: true, messageTs: result.ts };
   } catch (error) {
-    console.error('Error sending Slack channel message:', error.message);
+    console.error('Error sending Slack channel message:', error);
     return { success: false, error: error.message };
   }
 }
@@ -226,17 +226,9 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
-// Serve admin login page
+// Serve admin dashboard (no login required)
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'admin.html'));
-});
-
-// Serve admin dashboard
-app.get('/admin/dashboard', (req, res) => {
-  if (!req.session.isAdmin) {
-    return res.redirect('/admin');
-  }
-  res.sendFile(path.join(__dirname, 'views', 'dashboard.html'));
 });
 
 // API Routes
@@ -265,8 +257,8 @@ app.get('/api/employees', (req, res) => {
   res.json({ employees });
 });
 
-// Create employee (admin only)
-app.post('/api/employees', requireAuth, upload.single('photo'), (req, res) => {
+// Create employee
+app.post('/api/employees', upload.single('photo'), (req, res) => {
   const { name, email, department, position, slackUserId } = req.body;
   
   if (!name) {
@@ -290,8 +282,8 @@ app.post('/api/employees', requireAuth, upload.single('photo'), (req, res) => {
   res.status(201).json(employee);
 });
 
-// Update employee (admin only)
-app.put('/api/employees/:id', requireAuth, upload.single('photo'), (req, res) => {
+// Update employee
+app.put('/api/employees/:id', upload.single('photo'), (req, res) => {
   const { id } = req.params;
   const { name, email, department, position, slackUserId } = req.body;
   
@@ -324,8 +316,8 @@ app.put('/api/employees/:id', requireAuth, upload.single('photo'), (req, res) =>
   res.json(employee);
 });
 
-// Delete employee (admin only)
-app.delete('/api/employees/:id', requireAuth, (req, res) => {
+// Delete employee
+app.delete('/api/employees/:id', (req, res) => {
   const { id } = req.params;
   
   const employeeIndex = employees.findIndex(emp => emp.id === id);
@@ -392,10 +384,11 @@ app.post('/api/notify', async (req, res) => {
       if (employee.slackUserId) {
         slackResult = await sendSlackDirectMessage(employee.slackUserId, slackMessage);
       }
-      // Otherwise, send to channel if specified
-      else if (channelId) {
+      // Otherwise, send to default channel
+      else {
+        const defaultChannel = process.env.SLACK_DEFAULT_CHANNEL || 'C07V5SGFTLD'; // fallback channel ID
         const channelMessage = `👋 ${activity.guestName} is here to see ${employee.name} at the front desk.`;
-        slackResult = await sendSlackChannelMessage(channelId, channelMessage);
+        slackResult = await sendSlackChannelMessage(channelId || defaultChannel, channelMessage);
       }
     } catch (error) {
       console.error('Error sending Slack notification:', error.message);
@@ -416,13 +409,13 @@ app.post('/api/notify', async (req, res) => {
   });
 });
 
-// Get activity logs (admin only)
-app.get('/api/activity', requireAuth, (req, res) => {
+// Get activity logs
+app.get('/api/activity', (req, res) => {
   res.json(activityLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)));
 });
 
-// Lookup Slack user by email (admin only)
-app.post('/api/slack/lookup-user', requireAuth, async (req, res) => {
+// Lookup Slack user by email
+app.post('/api/slack/lookup-user', async (req, res) => {
   const { email } = req.body;
   
   if (!email) {
@@ -446,8 +439,8 @@ app.post('/api/slack/lookup-user', requireAuth, async (req, res) => {
   }
 });
 
-// Test Slack connection (admin only)
-app.get('/api/slack/test', requireAuth, async (req, res) => {
+// Test Slack connection
+app.get('/api/slack/test', async (req, res) => {
   if (!slack) {
     return res.status(503).json({ error: 'Slack not configured' });
   }
@@ -471,27 +464,7 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Test Slack connection
-app.get('/api/slack/test', async (req, res) => {
-  if (!slack) {
-    return res.json({ error: 'No Slack token configured' });
-  }
-  
-  try {
-    const result = await slack.auth.test();
-    res.json({ 
-      success: true, 
-      user: result.user,
-      team: result.team,
-      url: result.url 
-    });
-  } catch (error) {
-    res.json({ 
-      error: 'Slack connection failed', 
-      details: error.message 
-    });
-  }
-});
+
 
 // Error handling
 app.use((err, req, res, next) => {

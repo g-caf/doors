@@ -3,165 +3,533 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Guest Check-in System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Admin - Sourcegraph Guest Check-in</title>
     <style>
-        /* Custom brand colors and dark theme */
-        :root {
-            --brand-red: #ff5543;
-            --brand-white: #fcfcfc;
-            --dark-bg: #1a1a1a;
-            --card-bg: #2a2a2a;
-            --border-color: #404040;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
         body {
+            font-family: 'Georgia', 'Times New Roman', serif;
             background: #000 url('/public/BLANKSLATE.pdf.png') center center / cover no-repeat;
-            color: var(--brand-white);
+            color: #fff;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Main content container */
+        .container {
+            position: relative;
+            z-index: 2;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+        }
+        
+        .logo {
+            max-width: 300px;
+        }
+        
+        .logo svg {
+            width: 100%;
+            height: auto;
+        }
+        
+        .admin-title {
+            font-size: 2.5rem;
+            font-weight: 400;
+            color: #fff;
+        }
+        
+        /* Main content area */
+        .main-content {
+            display: flex;
+            gap: 4rem;
+            flex: 1;
+        }
+        
+        /* Employee management section */
+        .employee-section {
+            flex: 1;
+            min-width: 600px;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: #fff;
+        }
+        
+        /* Employee list */
+        .employee-list {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            backdrop-filter: blur(15px);
+            margin-bottom: 2rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .employee-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background 0.3s ease;
+        }
+        
+        .employee-item:last-child {
+            border-bottom: none;
+        }
+        
+        .employee-item:hover {
+            background: rgba(255, 85, 67, 0.1);
+        }
+        
+        .employee-photo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .employee-info {
+            flex: 1;
+        }
+        
+        .employee-name {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+        
+        .employee-details {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .delete-button {
+            background: rgba(255, 85, 67, 0.2);
+            border: 1px solid #ff5543;
+            color: #ff5543;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+        
+        .delete-button:hover {
+            background: #ff5543;
+            color: #fff;
+        }
+        
+        /* Add employee form */
+        .add-employee-form {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            backdrop-filter: blur(15px);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: #fff;
         }
         
         .form-input {
-            background-color: var(--card-bg);
-            border: 2px solid var(--border-color);
-            color: var(--brand-white);
-        }
-        .form-input:focus {
-            border-color: var(--brand-red);
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            width: 100%;
             outline: none;
-            box-shadow: 0 0 0 3px rgba(255, 85, 67, 0.1);
-        }
-        .form-input::placeholder {
-            color: #999;
-        }
-        
-        .btn-primary {
-            background-color: var(--brand-red);
-            color: white;
-            font-weight: 600;
-            border: none;
             transition: all 0.3s ease;
         }
-        .btn-primary:hover {
-            background-color: #e04435;
+        
+        .form-input:focus {
+            border-color: #ff5543;
+            background: rgba(255, 85, 67, 0.2);
+        }
+        
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .file-input {
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .file-input:hover {
+            border-color: #ff5543;
+            background: rgba(255, 85, 67, 0.2);
+        }
+        
+        .add-button {
+            background: #ff5543;
+            color: #fff;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 400;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .add-button:hover {
+            background: #e04435;
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(255, 85, 67, 0.3);
+            box-shadow: 0 4px 12px rgba(255, 85, 67, 0.4);
         }
         
-        .btn-secondary {
-            background-color: var(--border-color);
-            color: var(--brand-white);
-            border: 2px solid var(--border-color);
-            font-weight: 600;
-        }
-        .btn-secondary:hover {
-            background-color: #505050;
-            border-color: #505050;
+        /* Statistics section */
+        .stats-section {
+            flex: 0 0 300px;
         }
         
-        .login-card {
-            background-color: var(--card-bg);
-            border: 2px solid var(--border-color);
+        .stats-card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            backdrop-filter: blur(15px);
+            margin-bottom: 2rem;
         }
         
-        .logo-container {
-            max-width: 250px;
-            margin: 0 auto;
+        .stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #ff5543;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.1rem;
+        }
+        
+        /* Activity log */
+        .activity-log {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .activity-item {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-time {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 0.25rem;
+        }
+        
+        .activity-message {
+            font-size: 0.9rem;
+        }
+        
+        /* Success message */
+        .success-message {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid #10b981;
+            color: #10b981;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+        
+        /* Home link */
+        .home-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 1rem;
+            transition: color 0.3s ease;
+        }
+        
+        .home-link:hover {
+            color: #ff5543;
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center">
-    <div class="max-w-md w-full mx-4">
-        <div class="login-card rounded-lg p-8">
-            <!-- Logo -->
-            <div class="logo-container mb-8">
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">
                 <img src="/public/primary-dark-mode.svg" alt="Sourcegraph" style="width: 100%; height: auto;">
             </div>
-            
-            <h2 class="text-2xl font-bold text-center mb-8" style="color: var(--brand-white);">Admin Login</h2>
-            
-            <form id="loginForm">
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-2" style="color: var(--brand-white);">Username</label>
-                    <input 
-                        type="text" 
-                        id="username" 
-                        required 
-                        class="form-input w-full px-4 py-3 rounded-lg"
-                        placeholder="Enter username"
-                    >
+            <div style="text-align: right;">
+                <div class="admin-title">Admin Dashboard</div>
+                <a href="/" class="home-link">← Back to Kiosk</a>
+            </div>
+        </div>
+        
+        <!-- Main content -->
+        <div class="main-content">
+            <!-- Employee management -->
+            <div class="employee-section">
+                <h2 class="section-title">Employee Directory</h2>
+                
+                <!-- Employee list -->
+                <div class="employee-list" id="employeeList">
+                    <!-- Employees will be loaded here -->
                 </div>
                 
-                <div class="mb-6">
-                    <label class="block text-sm font-medium mb-2" style="color: var(--brand-white);">Password</label>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        required 
-                        class="form-input w-full px-4 py-3 rounded-lg"
-                        placeholder="Enter password"
-                    >
+                <!-- Add employee form -->
+                <div class="add-employee-form">
+                    <h3 style="margin-bottom: 1.5rem; font-size: 1.5rem;">Add New Employee</h3>
+                    
+                    <div class="success-message" id="successMessage">
+                        Employee added successfully!
+                    </div>
+                    
+                    <form id="addEmployeeForm">
+                        <div class="form-group">
+                            <label class="form-label">Name *</label>
+                            <input type="text" class="form-input" id="employeeName" placeholder="Enter employee name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-input" id="employeeEmail" placeholder="Enter email address">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Department</label>
+                            <input type="text" class="form-input" id="employeeDepartment" placeholder="Enter department">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Position</label>
+                            <input type="text" class="form-input" id="employeePosition" placeholder="Enter job title">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Photo</label>
+                            <input type="file" class="file-input" id="employeePhoto" accept="image/*">
+                        </div>
+                        
+                        <button type="submit" class="add-button">Add Employee</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Statistics -->
+            <div class="stats-section">
+                <div class="stats-card">
+                    <div class="stat-number" id="totalEmployees">0</div>
+                    <div class="stat-label">Total Employees</div>
                 </div>
                 
-                <button 
-                    type="submit" 
-                    class="btn-primary w-full py-3 rounded-lg font-medium"
-                    id="loginBtn"
-                >
-                    Login
-                </button>
-            </form>
-            
-            <div id="errorMessage" class="mt-4 text-center text-red-400 hidden"></div>
+                <div class="stats-card">
+                    <div class="stat-number" id="todayVisits">0</div>
+                    <div class="stat-label">Today's Visits</div>
+                </div>
+                
+                <div class="stats-card">
+                    <h3 style="margin-bottom: 1rem; font-size: 1.2rem;">Recent Activity</h3>
+                    <div class="activity-log" id="activityLog">
+                        <!-- Recent activity will be loaded here -->
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        let employees = [];
+        let activities = [];
+        
+        // Load employees and activities
+        async function loadData() {
+            try {
+                // Load employees
+                const employeeResponse = await fetch('/api/employees');
+                const employeeData = await employeeResponse.json();
+                employees = employeeData.employees || [];
+                
+                // Load activities
+                const activityResponse = await fetch('/api/activity');
+                activities = await activityResponse.json();
+                
+                renderEmployees();
+                updateStats();
+                renderActivity();
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        }
+        
+        // Render employee list
+        function renderEmployees() {
+            const list = document.getElementById('employeeList');
+            list.innerHTML = employees.map(employee => `
+                <div class="employee-item">
+                    <img src="${employee.photo_url || employee.photo || ''}" alt="${employee.name}" class="employee-photo" 
+                         onerror="this.style.display='none'">
+                    <div class="employee-info">
+                        <div class="employee-name">${employee.name}</div>
+                        <div class="employee-details">
+                            ${employee.department || 'No department'} • ${employee.position || 'No position'}
+                            ${employee.email ? ` • ${employee.email}` : ''}
+                        </div>
+                    </div>
+                    <button class="delete-button" onclick="deleteEmployee('${employee.id}')">Delete</button>
+                </div>
+            `).join('');
+            
+            // Update employee count
+            document.getElementById('totalEmployees').textContent = employees.length;
+        }
+        
+        // Update statistics
+        function updateStats() {
+            // Count today's visits
+            const today = new Date().toDateString();
+            const todayVisits = activities.filter(activity => 
+                new Date(activity.timestamp).toDateString() === today
+            ).length;
+            
+            document.getElementById('todayVisits').textContent = todayVisits;
+        }
+        
+        // Render recent activity
+        function renderActivity() {
+            const activityLog = document.getElementById('activityLog');
+            const recentActivities = activities.slice(0, 10);
+            
+            if (recentActivities.length === 0) {
+                activityLog.innerHTML = '<div style="text-align: center; color: rgba(255, 255, 255, 0.6);">No recent activity</div>';
+                return;
+            }
+            
+            activityLog.innerHTML = recentActivities.map(activity => `
+                <div class="activity-item">
+                    <div class="activity-time">${new Date(activity.timestamp).toLocaleString()}</div>
+                    <div class="activity-message">${activity.guestName} visited ${activity.employeeName}</div>
+                </div>
+            `).join('');
+        }
+        
+        // Add employee
+        document.getElementById('addEmployeeForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const loginBtn = document.getElementById('loginBtn');
-            const errorMessage = document.getElementById('errorMessage');
+            const formData = new FormData();
+            formData.append('name', document.getElementById('employeeName').value);
+            formData.append('email', document.getElementById('employeeEmail').value);
+            formData.append('department', document.getElementById('employeeDepartment').value);
+            formData.append('position', document.getElementById('employeePosition').value);
             
-            // Show loading state
-            loginBtn.textContent = 'Logging in...';
-            loginBtn.disabled = true;
-            errorMessage.classList.add('hidden');
+            const photoFile = document.getElementById('employeePhoto').files[0];
+            if (photoFile) {
+                formData.append('photo', photoFile);
+            }
             
             try {
-                const response = await fetch('/api/auth/login', {
+                const response = await fetch('/api/employees', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ username, password })
+                    body: formData
                 });
                 
-                const result = await response.json();
-                
-                if (response.ok && result.success) {
-                    // Store token and redirect to dashboard
-                    localStorage.setItem('adminToken', result.token);
-                    window.location.href = '/admin/dashboard';
+                if (response.ok) {
+                    const newEmployee = await response.json();
+                    employees.push(newEmployee);
+                    renderEmployees();
+                    
+                    // Show success message
+                    const successMessage = document.getElementById('successMessage');
+                    successMessage.style.display = 'block';
+                    setTimeout(() => {
+                        successMessage.style.display = 'none';
+                    }, 3000);
+                    
+                    // Reset form
+                    document.getElementById('addEmployeeForm').reset();
                 } else {
-                    errorMessage.textContent = result.error || 'Invalid credentials';
-                    errorMessage.classList.remove('hidden');
+                    const error = await response.json();
+                    alert('Error adding employee: ' + error.error);
                 }
             } catch (error) {
-                console.error('Login error:', error);
-                errorMessage.textContent = 'Login failed. Please try again.';
-                errorMessage.classList.remove('hidden');
-            } finally {
-                loginBtn.textContent = 'Login';
-                loginBtn.disabled = false;
+                console.error('Error adding employee:', error);
+                alert('Failed to add employee. Please try again.');
             }
         });
-
-        // Check if already logged in
-        if (localStorage.getItem('adminToken')) {
-            window.location.href = '/admin/dashboard';
+        
+        // Delete employee
+        async function deleteEmployee(employeeId) {
+            const employee = employees.find(emp => emp.id === employeeId);
+            if (!employee) return;
+            
+            if (!confirm(`Are you sure you want to delete ${employee.name}?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/employees/${employeeId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    employees = employees.filter(emp => emp.id !== employeeId);
+                    renderEmployees();
+                } else {
+                    const error = await response.json();
+                    alert('Error deleting employee: ' + error.error);
+                }
+            } catch (error) {
+                console.error('Error deleting employee:', error);
+                alert('Failed to delete employee. Please try again.');
+            }
         }
+        
+        // Initialize
+        loadData();
+        
+        // Refresh data every 30 seconds
+        setInterval(loadData, 30000);
     </script>
 </body>
 </html>
