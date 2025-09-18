@@ -414,6 +414,87 @@
         let employees = [];
         let activities = [];
         
+        // Edit employee function (moved to top for onclick handlers)
+        function editEmployee(employeeId) {
+            console.log('Edit button clicked for employee:', employeeId);
+            const employee = employees.find(emp => emp.id === employeeId);
+            if (!employee) {
+                console.error('Employee not found:', employeeId);
+                alert('Employee not found!');
+                return;
+            }
+            
+            console.log('Found employee for editing:', employee);
+            
+            // Populate form with employee data
+            document.getElementById('employeeName').value = employee.name || '';
+            document.getElementById('employeeEmail').value = employee.email || '';
+            document.getElementById('employeeDepartment').value = employee.department || '';
+            document.getElementById('employeePosition').value = employee.position || '';
+            
+            // Change form to edit mode
+            const form = document.getElementById('addEmployeeForm');
+            const submitButton = form.querySelector('.add-button');
+            const formTitle = document.querySelector('h3[style*="margin-bottom: 1.5rem"]');
+            
+            if (formTitle) {
+                formTitle.textContent = `Edit ${employee.name}`;
+            }
+            if (submitButton) {
+                submitButton.textContent = 'Update Employee';
+            }
+            form.setAttribute('data-editing', employeeId);
+            
+            console.log('Form updated for editing');
+            
+            // Scroll to form
+            form.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Delete employee function (moved to top for onclick handlers)
+        async function deleteEmployee(employeeId) {
+            console.log('Delete button clicked for employee:', employeeId);
+            const employee = employees.find(emp => emp.id === employeeId);
+            if (!employee) return;
+            
+            if (!confirm(`Are you sure you want to delete ${employee.name}?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/employees/${employeeId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    employees = employees.filter(emp => emp.id !== employeeId);
+                    renderEmployees();
+                } else {
+                    const error = await response.json();
+                    alert('Error deleting employee: ' + error.error);
+                }
+            } catch (error) {
+                console.error('Error deleting employee:', error);
+                alert('Failed to delete employee. Please try again.');
+            }
+        }
+        
+        // Reset form to add mode
+        function resetFormToAddMode() {
+            const form = document.getElementById('addEmployeeForm');
+            const submitButton = form.querySelector('.add-button');
+            const formTitle = document.querySelector('h3[style*="margin-bottom: 1.5rem"]');
+            
+            if (formTitle) {
+                formTitle.textContent = 'Add New Employee';
+            }
+            if (submitButton) {
+                submitButton.textContent = 'Add Employee';
+            }
+            form.removeAttribute('data-editing');
+            form.reset();
+        }
+        
         // Load employees and activities
         async function loadData() {
             try {
@@ -551,83 +632,7 @@
                 alert(`Failed to ${isEditing ? 'update' : 'add'} employee. Please try again.`);
             }
         });
-        
-        // Edit employee
-        function editEmployee(employeeId) {
-            console.log('Editing employee:', employeeId);
-            const employee = employees.find(emp => emp.id === employeeId);
-            if (!employee) {
-                console.error('Employee not found:', employeeId);
-                return;
-            }
-            
-            console.log('Found employee:', employee);
-            
-            // Populate form with employee data
-            document.getElementById('employeeName').value = employee.name || '';
-            document.getElementById('employeeEmail').value = employee.email || '';
-            document.getElementById('employeeDepartment').value = employee.department || '';
-            document.getElementById('employeePosition').value = employee.position || '';
-            
-            // Change form to edit mode
-            const form = document.getElementById('addEmployeeForm');
-            const submitButton = form.querySelector('.add-button');
-            const formTitle = document.querySelector('h3[style*="margin-bottom: 1.5rem"]');
-            
-            if (formTitle) {
-                formTitle.textContent = `Edit ${employee.name}`;
-            }
-            if (submitButton) {
-                submitButton.textContent = 'Update Employee';
-            }
-            form.setAttribute('data-editing', employeeId);
-            
-            // Scroll to form
-            form.scrollIntoView({ behavior: 'smooth' });
-        }
-        
-        // Reset form to add mode
-        function resetFormToAddMode() {
-            const form = document.getElementById('addEmployeeForm');
-            const submitButton = form.querySelector('.add-button');
-            const formTitle = document.querySelector('h3[style*="margin-bottom: 1.5rem"]');
-            
-            if (formTitle) {
-                formTitle.textContent = 'Add New Employee';
-            }
-            if (submitButton) {
-                submitButton.textContent = 'Add Employee';
-            }
-            form.removeAttribute('data-editing');
-            form.reset();
-        }
-        
-        // Delete employee
-        async function deleteEmployee(employeeId) {
-            const employee = employees.find(emp => emp.id === employeeId);
-            if (!employee) return;
-            
-            if (!confirm(`Are you sure you want to delete ${employee.name}?`)) {
-                return;
-            }
-            
-            try {
-                const response = await fetch(`/api/employees/${employeeId}`, {
-                    method: 'DELETE'
-                });
-                
-                if (response.ok) {
-                    employees = employees.filter(emp => emp.id !== employeeId);
-                    renderEmployees();
-                } else {
-                    const error = await response.json();
-                    alert('Error deleting employee: ' + error.error);
-                }
-            } catch (error) {
-                console.error('Error deleting employee:', error);
-                alert('Failed to delete employee. Please try again.');
-            }
-        }
+
         
         // Initialize
         loadData();
