@@ -206,8 +206,12 @@ const upload = multer({
   }
 });
 
-// Static files
-app.use('/public', express.static('public'));
+// Static files with caching
+app.use('/public', express.static('public', {
+  maxAge: '1y', // Cache for 1 year
+  etag: false, // Disable etag
+  lastModified: false
+}));
 
 // Auth middleware
 function requireAuth(req, res, next) {

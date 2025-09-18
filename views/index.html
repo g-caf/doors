@@ -5,6 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sourcegraph Guest Check-in</title>
     <link rel="icon" type="image/png" href="/public/favicon.png">
+    
+    <!-- Preload critical images -->
+    <link rel="preload" as="image" href="/public/BLANKSLATE.pdf.png">
+    <link rel="preload" as="image" href="/public/primary-dark-mode.svg">
+    <link rel="preload" as="image" href="/public/favicon.png">
+    
+    <!-- Preload employee photos -->
+    <link rel="preload" as="image" href="/public/Adrienne%20Caffarel.png">
+    <link rel="preload" as="image" href="/public/Beyang%20Liu.png">
+    <link rel="preload" as="image" href="/public/Dan%20Adler.png">
+    <link rel="preload" as="image" href="/public/Madison%20Clark.png">
+    <link rel="preload" as="image" href="/public/Quinn%20Slack.png">
+    
     <style>
         * {
             margin: 0;
@@ -308,23 +321,13 @@
             50% { opacity: 1; }
         }
         
-        /* Preload critical images */
-        body::before {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 0;
-            overflow: hidden;
-            z-index: -1;
-            background-image: 
-                url('/public/BLANKSLATE.pdf.png'),
-                url('/public/primary-dark-mode.svg'),
-                url('/public/favicon.png'),
-                url('/public/Adrienne%20Caffarel.png'),
-                url('/public/Beyang%20Liu.png'),
-                url('/public/Dan%20Adler.png'),
-                url('/public/Madison%20Clark.png'),
-                url('/public/Quinn%20Slack.png');
+        /* Image loading states */
+        .employee-photo {
+            transition: opacity 0.3s ease;
+        }
+        
+        .employee-photo.loading {
+            opacity: 0.5;
         }
     </style>
 </head>
@@ -415,7 +418,9 @@
             
             list.innerHTML = filtered.map(employee => `
                 <div class="dropdown-item" data-id="${employee.id}" data-name="${employee.name}" data-photo="${employee.photo_url || ''}">
-                    <img src="${employee.photo_url || ''}" alt="${employee.name}" class="employee-photo" 
+                    <img src="${employee.photo_url || ''}" alt="${employee.name}" class="employee-photo loading" 
+                         loading="eager" decoding="async"
+                         onload="this.classList.remove('loading')"
                          onerror="this.style.display='none'">
                     <span>${employee.name}</span>
                 </div>

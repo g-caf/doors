@@ -5,6 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Sourcegraph Guest Check-in</title>
     <link rel="icon" type="image/png" href="/public/favicon.png">
+    
+    <!-- Preload critical images -->
+    <link rel="preload" as="image" href="/public/BLANKSLATE.pdf.png">
+    <link rel="preload" as="image" href="/public/primary-dark-mode.svg">
+    <link rel="preload" as="image" href="/public/favicon.png">
+    
+    <!-- Preload employee photos -->
+    <link rel="preload" as="image" href="/public/Adrienne%20Caffarel.png">
+    <link rel="preload" as="image" href="/public/Beyang%20Liu.png">
+    <link rel="preload" as="image" href="/public/Dan%20Adler.png">
+    <link rel="preload" as="image" href="/public/Madison%20Clark.png">
+    <link rel="preload" as="image" href="/public/Quinn%20Slack.png">
+    
     <style>
         * {
             margin: 0;
@@ -107,6 +120,11 @@
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: opacity 0.3s ease;
+        }
+        
+        .employee-photo.loading {
+            opacity: 0.5;
         }
         
         .employee-info {
@@ -530,7 +548,9 @@
             const list = document.getElementById('employeeList');
             list.innerHTML = employees.map(employee => `
                 <div class="employee-item">
-                    <img src="${employee.photo_url || employee.photo || ''}" alt="${employee.name}" class="employee-photo" 
+                    <img src="${employee.photo_url || employee.photo || ''}" alt="${employee.name}" class="employee-photo loading" 
+                         loading="eager" decoding="async"
+                         onload="this.classList.remove('loading')"
                          onerror="this.style.display='none'">
                     <div class="employee-info">
                         <div class="employee-name">${employee.name}</div>
