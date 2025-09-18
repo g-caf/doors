@@ -24,7 +24,7 @@ let employees = [
     department: "Operations",
     position: "Office Manager",
     photo_url: "/public/Adrienne%20Caffarel.png",
-    slackUserId: null,
+    slackUserId: "U090LMB9VFS",
     createdAt: new Date().toISOString()
   },
   {
@@ -34,7 +34,7 @@ let employees = [
     department: "Engineering",
     position: "CTO",
     photo_url: "/public/Beyang%20Liu.png",
-    slackUserId: null,
+    slackUserId: "U02FRPWET",
     createdAt: new Date().toISOString()
   },
   {
@@ -44,7 +44,7 @@ let employees = [
     department: "Operations",
     position: "VP of Operations",
     photo_url: "/public/Dan%20Adler.png",
-    slackUserId: null,
+    slackUserId: "U262VP3SQ",
     createdAt: new Date().toISOString()
   },
   {
@@ -54,7 +54,7 @@ let employees = [
     department: "Communications",
     position: "Communications Director",
     photo_url: "/public/Madison%20Clark.png",
-    slackUserId: null,
+    slackUserId: "U0328TZ54J2",
     createdAt: new Date().toISOString()
   },
   {
@@ -64,7 +64,7 @@ let employees = [
     department: "Executive",
     position: "CEO",
     photo_url: "/public/Quinn%20Slack.png",
-    slackUserId: null, 
+    slackUserId: "U02FSM7DN", 
     createdAt: new Date().toISOString()
   }
 ];
@@ -374,25 +374,41 @@ app.post('/api/notify', async (req, res) => {
     try {
       // If employee doesn't have slackUserId but has email, try to find Slack user
       if (!employee.slackUserId && employee.email) {
+        console.log(`Looking up Slack user for email: ${employee.email}`);
         const slackUserId = await findSlackUserByEmail(employee.email);
         if (slackUserId) {
+          console.log(`Found Slack user ID: ${slackUserId}`);
           employee.slackUserId = slackUserId;
           saveData(); // Save the updated slackUserId for future use
+        } else {
+          console.log(`No Slack user found for email: ${employee.email}`);
         }
       }
 
-      // Send to employee via DM if we have their Slack user ID
+      let dmResult = null;
+      let channelResult = null;
+
+      // Send DM if we have the employee's Slack user ID
       if (employee.slackUserId) {
-        slackResult = await sendSlackDirectMessage(employee.slackUserId, slackMessage);
+        console.log(`Sending DM to user ID: ${employee.slackUserId}`);
+        dmResult = await sendSlackDirectMessage(employee.slackUserId, slackMessage);
       }
-      // Otherwise, send to default channel
-      else {
-        const defaultChannel = process.env.SLACK_DEFAULT_CHANNEL || 'C07V5SGFTLD'; // fallback channel ID
-        const channelMessage = `👋 ${activity.guestName} is here to see ${employee.name}.`;
-        slackResult = await sendSlackChannelMessage(channelId || defaultChannel, channelMessage);
-      }
+
+      // Also send to channel for visibility
+      const defaultChannel = process.env.SLACK_DEFAULT_CHANNEL || 'C07V5SGFTLD';
+      const channelMessage = `👋 ${activity.guestName} is here to see ${employee.name}.`;
+      console.log(`Sending channel message to: ${channelId || defaultChannel}`);
+      channelResult = await sendSlackChannelMessage(channelId || defaultChannel, channelMessage);
+
+      // Report success if either method worked
+      slackResult = {
+        success: (dmResult?.success || channelResult?.success) || false,
+        dm: dmResult,
+        channel: channelResult
+      };
+
     } catch (error) {
-      console.error('Error sending Slack notification:', error.message);
+      console.error('Error sending Slack notification:', error);
       slackResult = { success: false, error: error.message };
     }
   }
