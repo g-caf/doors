@@ -503,8 +503,8 @@
                 const employeeData = await employeeResponse.json();
                 employees = employeeData.employees || [];
                 
-                // Load activities
-                const activityResponse = await fetch('/api/activity');
+                // Load activities (with cache busting)
+                const activityResponse = await fetch('/api/activity?ts=' + Date.now(), { cache: 'no-store' });
                 activities = await activityResponse.json();
                 
                 renderEmployees();

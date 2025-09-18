@@ -154,6 +154,7 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://cdn.tailwindcss.com"],
       scriptSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrcAttr: ["'self'", "'unsafe-inline'"],
       imgSrc: ["'self'", "data:", "blob:"],
     },
   },
@@ -423,8 +424,9 @@ app.post('/api/notify', async (req, res) => {
   });
 });
 
-// Get activity logs
+// Get activity logs (no cache)
 app.get('/api/activity', (req, res) => {
+  res.set('Cache-Control', 'no-store');
   res.json(activityLogs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)));
 });
 
