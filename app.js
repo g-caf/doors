@@ -12,7 +12,53 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Data storage
-let employees = [];
+let employees = [
+  {
+    id: "1",
+    name: "Adrienne Caffarel",
+    email: "adrienne@sourcegraph.com",
+    department: "Engineering",
+    position: "Software Engineer",
+    photo_url: "/public/Adrienne%20Caffarel.png",
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "2", 
+    name: "Beyang Liu",
+    email: "beyang@sourcegraph.com",
+    department: "Engineering",
+    position: "CTO",
+    photo_url: "/public/Beyang%20Liu.png",
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "3",
+    name: "Dan Adler", 
+    email: "dan@sourcegraph.com",
+    department: "Engineering",
+    position: "VP of Engineering",
+    photo_url: "/public/Dan%20Adler.png",
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "4",
+    name: "Madison Clark",
+    email: "madison@sourcegraph.com", 
+    department: "Engineering",
+    position: "Software Engineer",
+    photo_url: "/public/Madison%20Clark.png",
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "5",
+    name: "Quinn Slack",
+    email: "quinn@sourcegraph.com",
+    department: "Executive",
+    position: "CEO",
+    photo_url: "/public/Quinn%20Slack.png", 
+    createdAt: new Date().toISOString()
+  }
+];
 let activityLogs = [];
 
 // Load data from JSON files if they exist
