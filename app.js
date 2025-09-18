@@ -70,14 +70,12 @@ let employees = [
 ];
 let activityLogs = [];
 
-// Load data from JSON files if they exist
+// Load activity data from JSON files if they exist, but keep hardcoded employees with Slack IDs
 try {
-  if (fs.existsSync('./data/employees.json')) {
-    employees = JSON.parse(fs.readFileSync('./data/employees.json', 'utf8'));
-  }
   if (fs.existsSync('./data/activity.json')) {
     activityLogs = JSON.parse(fs.readFileSync('./data/activity.json', 'utf8'));
   }
+  console.log('Using hardcoded employee data with Slack user IDs');
 } catch (error) {
   console.log('No existing data found, starting fresh');
 }
@@ -87,9 +85,8 @@ if (!fs.existsSync('./data')) {
   fs.mkdirSync('./data', { recursive: true });
 }
 
-// Save data to JSON files
+// Save activity data to JSON file (employees are hardcoded)
 function saveData() {
-  fs.writeFileSync('./data/employees.json', JSON.stringify(employees, null, 2));
   fs.writeFileSync('./data/activity.json', JSON.stringify(activityLogs, null, 2));
 }
 
