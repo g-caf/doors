@@ -500,7 +500,6 @@
             formData.append('email', document.getElementById('employeeEmail').value);
             formData.append('department', document.getElementById('employeeDepartment').value);
             formData.append('position', document.getElementById('employeePosition').value);
-            formData.append('slackUserId', document.getElementById('employeeSlackUserId').value);
             
             const photoFile = document.getElementById('employeePhoto').files[0];
             if (photoFile) {
@@ -554,8 +553,14 @@
         
         // Edit employee
         function editEmployee(employeeId) {
+            console.log('Editing employee:', employeeId);
             const employee = employees.find(emp => emp.id === employeeId);
-            if (!employee) return;
+            if (!employee) {
+                console.error('Employee not found:', employeeId);
+                return;
+            }
+            
+            console.log('Found employee:', employee);
             
             // Populate form with employee data
             document.getElementById('employeeName').value = employee.name || '';
@@ -566,10 +571,14 @@
             // Change form to edit mode
             const form = document.getElementById('addEmployeeForm');
             const submitButton = form.querySelector('.add-button');
-            const formTitle = form.previousElementSibling;
+            const formTitle = document.querySelector('h3[style*="margin-bottom: 1.5rem"]');
             
-            formTitle.textContent = `Edit ${employee.name}`;
-            submitButton.textContent = 'Update Employee';
+            if (formTitle) {
+                formTitle.textContent = `Edit ${employee.name}`;
+            }
+            if (submitButton) {
+                submitButton.textContent = 'Update Employee';
+            }
             form.setAttribute('data-editing', employeeId);
             
             // Scroll to form
@@ -580,10 +589,14 @@
         function resetFormToAddMode() {
             const form = document.getElementById('addEmployeeForm');
             const submitButton = form.querySelector('.add-button');
-            const formTitle = form.previousElementSibling;
+            const formTitle = document.querySelector('h3[style*="margin-bottom: 1.5rem"]');
             
-            formTitle.textContent = 'Add New Employee';
-            submitButton.textContent = 'Add Employee';
+            if (formTitle) {
+                formTitle.textContent = 'Add New Employee';
+            }
+            if (submitButton) {
+                submitButton.textContent = 'Add Employee';
+            }
             form.removeAttribute('data-editing');
             form.reset();
         }
