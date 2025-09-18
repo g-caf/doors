@@ -20,9 +20,9 @@ let employees = [
   {
     id: "1",
     name: "Adrienne Caffarel",
-    email: "adrienne@sourcegraph.com",
-    department: "Engineering",
-    position: "Software Engineer",
+    email: "adrienne.caffarel@sourcegraph.com",
+    department: "Operations",
+    position: "Office Manager",
     photo_url: "/public/Adrienne%20Caffarel.png",
     slackUserId: null,
     createdAt: new Date().toISOString()
@@ -41,8 +41,8 @@ let employees = [
     id: "3",
     name: "Dan Adler", 
     email: "dan@sourcegraph.com",
-    department: "Engineering",
-    position: "VP of Engineering",
+    department: "Operations",
+    position: "VP of Operations",
     photo_url: "/public/Dan%20Adler.png",
     slackUserId: null,
     createdAt: new Date().toISOString()
@@ -50,9 +50,9 @@ let employees = [
   {
     id: "4",
     name: "Madison Clark",
-    email: "madison@sourcegraph.com", 
-    department: "Engineering",
-    position: "Software Engineer",
+    email: "madison.clark@sourcegraph.com", 
+    department: "Communications",
+    position: "Communications Director",
     photo_url: "/public/Madison%20Clark.png",
     slackUserId: null,
     createdAt: new Date().toISOString()
@@ -60,7 +60,7 @@ let employees = [
   {
     id: "5",
     name: "Quinn Slack",
-    email: "quinn@sourcegraph.com",
+    email: "sqs@sourcegraph.com",
     department: "Executive",
     position: "CEO",
     photo_url: "/public/Quinn%20Slack.png",
@@ -469,6 +469,28 @@ app.get('/api/slack/test', requireAuth, async (req, res) => {
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Test Slack connection
+app.get('/api/slack/test', async (req, res) => {
+  if (!slack) {
+    return res.json({ error: 'No Slack token configured' });
+  }
+  
+  try {
+    const result = await slack.auth.test();
+    res.json({ 
+      success: true, 
+      user: result.user,
+      team: result.team,
+      url: result.url 
+    });
+  } catch (error) {
+    res.json({ 
+      error: 'Slack connection failed', 
+      details: error.message 
+    });
+  }
 });
 
 // Error handling
